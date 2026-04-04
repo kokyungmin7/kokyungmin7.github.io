@@ -1,49 +1,246 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const posts = (await getCollection('blog'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 5);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+			<!-- Profile Card -->
+			<div class="profile-card">
+				<div class="profile-avatar">
+					<span class="avatar-initials">고</span>
+				</div>
+				<div class="profile-info">
+					<h1 class="profile-name">고경민</h1>
+					<p class="profile-role">Computer Vision Engineer</p>
+					<div class="profile-links">
+						<a href="https://github.com/kokyungmin7" target="_blank" rel="noopener" class="profile-link">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+								<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+							</svg>
+							kokyungmin7
+						</a>
+						<a href="mailto:km.triple7@gmail.com" class="profile-link">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<rect x="2" y="4" width="20" height="16" rx="2"></rect>
+								<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+							</svg>
+							km.triple7@gmail.com
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<!-- Recent Posts -->
+			{posts.length > 0 && (
+				<section class="recent-section">
+					<div class="section-header">
+						<h2 class="section-title">Recent Posts</h2>
+						<a href="/blog" class="section-more">All posts →</a>
+					</div>
+					<ul class="post-list">
+						{posts.map((post) => (
+							<li>
+								<a href={`/blog/${post.id}/`} class="post-card">
+									<div class="post-meta">
+										<span class="post-date">
+											<FormattedDate date={post.data.pubDate} />
+										</span>
+									</div>
+									<div class="post-body">
+										<h3 class="post-title">{post.data.title}</h3>
+										{post.data.description && (
+											<p class="post-desc">{post.data.description}</p>
+										)}
+									</div>
+								</a>
+							</li>
+						))}
+					</ul>
+				</section>
+			)}
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<style>
+	/* Profile Card */
+	.profile-card {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		background: var(--bg-card);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		padding: 2rem;
+		margin-bottom: 2.5rem;
+	}
+	.profile-avatar {
+		flex-shrink: 0;
+		width: 72px;
+		height: 72px;
+		border-radius: 50%;
+		background: var(--accent-dim);
+		border: 2px solid var(--accent);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.avatar-initials {
+		font-size: 1.8em;
+		font-weight: 700;
+		color: var(--accent);
+	}
+	.profile-info {
+		flex: 1;
+		min-width: 0;
+	}
+	.profile-name {
+		font-size: 1.6em;
+		font-weight: 700;
+		margin: 0 0 0.2rem 0;
+		color: var(--text);
+	}
+	.profile-role {
+		font-size: 0.95em;
+		color: var(--text-muted);
+		margin: 0 0 0.9rem 0;
+	}
+	.profile-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+	.profile-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4em;
+		font-size: 0.875em;
+		color: var(--text-muted);
+		padding: 0.3em 0.7em;
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		text-decoration: none;
+		transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+	}
+	.profile-link:hover {
+		color: var(--accent);
+		border-color: var(--accent);
+		background-color: var(--accent-dim);
+		text-decoration: none;
+	}
+
+	/* Recent Posts Section */
+	.recent-section {
+		margin-top: 0;
+	}
+	.section-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 1rem;
+	}
+	.section-title {
+		font-size: 1.1em;
+		font-weight: 600;
+		color: var(--text-muted);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin: 0;
+	}
+	.section-more {
+		font-size: 0.875em;
+		color: var(--accent);
+		text-decoration: none;
+		transition: opacity 0.2s ease;
+	}
+	.section-more:hover {
+		opacity: 0.8;
+		text-decoration: none;
+	}
+
+	/* Post List */
+	.post-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+	.post-card {
+		display: flex;
+		gap: 1.5rem;
+		align-items: flex-start;
+		background: var(--bg-card);
+		border: 1px solid var(--border);
+		border-radius: 10px;
+		padding: 1.25rem 1.5rem;
+		text-decoration: none;
+		transition: border-color 0.2s ease, background-color 0.2s ease;
+	}
+	.post-card:hover {
+		border-color: var(--accent);
+		background-color: var(--accent-dim);
+		text-decoration: none;
+	}
+	.post-meta {
+		flex-shrink: 0;
+		padding-top: 0.2em;
+	}
+	.post-date {
+		font-size: 0.8em;
+		color: var(--text-muted);
+		white-space: nowrap;
+	}
+	.post-body {
+		flex: 1;
+		min-width: 0;
+	}
+	.post-title {
+		font-size: 1em;
+		font-weight: 600;
+		color: var(--text);
+		margin: 0 0 0.3rem 0;
+		line-height: 1.3;
+	}
+	.post-desc {
+		font-size: 0.875em;
+		color: var(--text-muted);
+		margin: 0;
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+	}
+
+	@media (max-width: 600px) {
+		.profile-card {
+			flex-direction: column;
+			text-align: center;
+			padding: 1.5rem;
+		}
+		.profile-links {
+			justify-content: center;
+		}
+		.post-card {
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+	}
+</style>

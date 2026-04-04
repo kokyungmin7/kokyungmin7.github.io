@@ -19,8 +19,8 @@ const { title, description, image = FallbackImage } = Astro.props;
 
 <!-- Theme initialization (must be first to prevent FOUC) -->
 <script is:inline>
-  const theme = localStorage.getItem('theme') ??
-    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const saved = localStorage.getItem('theme');
+  const theme = saved ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dark');
   document.documentElement.setAttribute('data-theme', theme);
 </script>
 
