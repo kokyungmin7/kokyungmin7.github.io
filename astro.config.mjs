@@ -9,7 +9,7 @@ import rehypeKatex from 'rehype-katex'
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://github.com/kokyungmin7/kokyungmin7.github.io.git',
+	site: 'https://kokyungmin7.github.io',
 	integrations: [mdx(), sitemap()],
         markdown: {
           remarkPlugins: [remarkMath],
