@@ -1,0 +1,338 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+
+const projects = (await getCollection('projects')).sort(
+	(a, b) => b.data.startDate.valueOf() - a.data.startDate.valueOf(),
+);
+
+const STATUS_LABEL: Record<string, string> = {
+	active: '진행 중',
+	wip: '개발 중',
+	archived: '완료',
+};
+const STATUS_COLOR: Record<string, string> = {
+	active: 'status-active',
+	wip: 'status-wip',
+	archived: 'status-archived',
+};
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<BaseHead title={`Projects — ${SITE_TITLE}`} description="고경민의 프로젝트 포트폴리오" />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="page-header">
+				<h1>Projects</h1>
+				<p class="page-desc">직접 구현한 아이디어와 프로젝트 모음입니다.</p>
+			</div>
+
+			{projects.length === 0 ? (
+				<div class="empty-state">
+					<p>아직 등록된 프로젝트가 없습니다.</p>
+					<p class="empty-hint">
+						<code>src/content/projects/</code>에 마크다운 파일을 추가하면 여기에 표시됩니다.
+					</p>
+				</div>
+			) : (
+				<div class="project-grid">
+					{projects.map((project) => (
+						<article class="project-card">
+							<!-- Header row -->
+							<div class="card-header">
+								<div class="card-badges">
+									<span class:list={['status-badge', STATUS_COLOR[project.data.status]]}>
+										{STATUS_LABEL[project.data.status]}
+									</span>
+									{project.data.category && (
+										<span class="category-badge">{project.data.category}</span>
+									)}
+								</div>
+								<div class="card-links">
+									{project.data.links?.github && (
+										<a href={project.data.links.github} target="_blank" rel="noopener" class="icon-link" aria-label="GitHub">
+											<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+												<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+											</svg>
+										</a>
+									)}
+									{project.data.links?.demo && (
+										<a href={project.data.links.demo} target="_blank" rel="noopener" class="icon-link" aria-label="Live Demo">
+											<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+												<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+												<polyline points="15 3 21 3 21 9"/>
+												<line x1="10" y1="14" x2="21" y2="3"/>
+											</svg>
+										</a>
+									)}
+								</div>
+							</div>
+
+							<!-- Title & Description -->
+							<h2 class="project-title">{project.data.title}</h2>
+							<p class="project-desc">{project.data.description}</p>
+
+							<!-- Metrics -->
+							{project.data.metrics && project.data.metrics.length > 0 && (
+								<div class="metrics-grid">
+									{project.data.metrics.map((m) => (
+										<div class="metric-item">
+											<span class="metric-value">{m.value}</span>
+											<span class="metric-label">{m.label}</span>
+										</div>
+									))}
+								</div>
+							)}
+
+							<!-- Highlights -->
+							{project.data.highlights && project.data.highlights.length > 0 && (
+								<ul class="highlights-list">
+									{project.data.highlights.map((h) => (
+										<li>{h}</li>
+									))}
+								</ul>
+							)}
+
+							<!-- Tech Stack -->
+							{project.data.techStack.length > 0 && (
+								<div class="tech-stack">
+									{project.data.techStack.map((tech) => (
+										<span class="tech-tag">{tech}</span>
+									))}
+								</div>
+							)}
+						</article>
+					))}
+				</div>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	main {
+		width: 960px;
+		max-width: calc(100% - 2em);
+		margin: auto;
+		padding: 3em 1em;
+	}
+
+	.page-header {
+		margin-bottom: 2.5rem;
+	}
+	.page-header h1 {
+		font-size: 2.2em;
+		margin: 0 0 0.4rem 0;
+	}
+	.page-desc {
+		font-size: 0.95em;
+		color: var(--text-muted);
+		margin: 0;
+	}
+
+	/* Empty state */
+	.empty-state {
+		background: var(--bg-card);
+		border: 1px dashed var(--border);
+		border-radius: 10px;
+		padding: 3rem;
+		text-align: center;
+		color: var(--text-muted);
+	}
+	.empty-state p { margin: 0 0 0.5em 0; }
+	.empty-hint { font-size: 0.875em; }
+	.empty-hint code {
+		background: var(--bg);
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		padding: 0.1em 0.4em;
+	}
+
+	/* Project grid */
+	.project-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+		gap: 1.25rem;
+	}
+
+	/* Project card */
+	.project-card {
+		background: var(--bg-card);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		transition: border-color 0.2s ease;
+	}
+	.project-card:hover {
+		border-color: var(--accent);
+	}
+
+	/* Card header */
+	.card-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.9rem;
+	}
+	.card-badges {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+	.card-links {
+		display: flex;
+		gap: 0.4rem;
+	}
+
+	/* Badges */
+	.status-badge,
+	.category-badge {
+		font-size: 0.75em;
+		font-weight: 600;
+		padding: 0.2em 0.65em;
+		border-radius: 20px;
+		letter-spacing: 0.02em;
+	}
+	.status-active {
+		background: rgba(52, 211, 153, 0.15);
+		color: #34d399;
+		border: 1px solid rgba(52, 211, 153, 0.3);
+	}
+	.status-wip {
+		background: rgba(251, 191, 36, 0.15);
+		color: #fbbf24;
+		border: 1px solid rgba(251, 191, 36, 0.3);
+	}
+	.status-archived {
+		background: rgba(156, 163, 175, 0.15);
+		color: #9ca3af;
+		border: 1px solid rgba(156, 163, 175, 0.3);
+	}
+	.category-badge {
+		background: var(--accent-dim);
+		color: var(--accent);
+		border: 1px solid rgba(140, 92, 245, 0.25);
+	}
+
+	/* Icon links */
+	.icon-link {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 30px;
+		height: 30px;
+		border-radius: 6px;
+		color: var(--text-muted);
+		text-decoration: none;
+		transition: color 0.15s ease, background-color 0.15s ease;
+	}
+	.icon-link:hover {
+		color: var(--accent);
+		background-color: var(--accent-dim);
+		text-decoration: none;
+	}
+
+	/* Title & desc */
+	.project-title {
+		font-size: 1.2em;
+		font-weight: 700;
+		color: var(--text);
+		margin: 0 0 0.45rem 0;
+		line-height: 1.3;
+	}
+	.project-desc {
+		font-size: 0.9em;
+		color: var(--text-muted);
+		margin: 0 0 1.25rem 0;
+		line-height: 1.5;
+	}
+
+	/* Metrics */
+	.metrics-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+		gap: 0.6rem;
+		margin-bottom: 1.25rem;
+	}
+	.metric-item {
+		background: var(--bg);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		padding: 0.7rem 0.8rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.2rem;
+		text-align: center;
+	}
+	.metric-value {
+		font-size: 1.25em;
+		font-weight: 700;
+		color: var(--accent);
+		line-height: 1;
+	}
+	.metric-label {
+		font-size: 0.72em;
+		color: var(--text-muted);
+		line-height: 1.2;
+	}
+
+	/* Highlights */
+	.highlights-list {
+		list-style: none;
+		margin: 0 0 1.25rem 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+	.highlights-list li {
+		font-size: 0.875em;
+		color: var(--text-muted);
+		padding-left: 1em;
+		position: relative;
+		line-height: 1.4;
+	}
+	.highlights-list li::before {
+		content: '›';
+		position: absolute;
+		left: 0;
+		color: var(--accent);
+		font-weight: 700;
+	}
+
+	/* Tech stack */
+	.tech-stack {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		margin-top: auto;
+		padding-top: 0.25rem;
+	}
+	.tech-tag {
+		font-size: 0.75em;
+		background: var(--bg);
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		padding: 0.2em 0.6em;
+		color: var(--text-muted);
+		font-family: ui-monospace, monospace;
+	}
+
+	@media (max-width: 768px) {
+		.project-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
