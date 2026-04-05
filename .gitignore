@@ -22,3 +22,16 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# local reference images (do not push)
+reference/
+
+# Claude Code local config (do not push)
+.claude/
+
+# Pretendard font files (large, do not push)
+public/fonts/Pretendard-1.3.9/
+
+# Markdown files except README
+*.md
+!README.md
