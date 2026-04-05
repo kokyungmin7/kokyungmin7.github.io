@@ -103,7 +103,7 @@ const currentCategory = category ?? '일반';
 
 				<!-- Right Sidebar: TOC -->
 				<aside class="sidebar sidebar-right">
-					<div class="sidebar-section toc-section" id="toc-container">
+					<div class="toc-section" id="toc-container">
 						<h3 class="sidebar-title">목차</h3>
 						<ul class="toc-list" id="toc-list"></ul>
 						<p class="toc-empty" id="toc-empty">헤딩이 없습니다.</p>
@@ -308,6 +308,14 @@ const currentCategory = category ?? '일반';
 	/* ── TOC ────────────────────────────── */
 	.toc-section {
 		position: relative;
+		border-top: 1px solid var(--border);
+		padding-top: 1rem;
+	}
+
+	.toc-section .sidebar-title {
+		margin-bottom: 0.75rem;
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid var(--border);
 	}
 
 	.toc-list {
