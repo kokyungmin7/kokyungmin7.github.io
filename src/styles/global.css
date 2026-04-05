@@ -211,6 +211,34 @@ hr {
 	}
 }
 
+/* ── Page layout ──────────────────────── */
+.page-wrapper {
+	display: flex;
+	align-items: flex-start;
+	max-width: 1400px;
+	margin: 0 auto;
+	padding: 2.5em 1.5em;
+	gap: 0;
+}
+
+.page-main {
+	flex: 1;
+	min-width: 0;
+	width: auto;
+	max-width: none;
+	margin: 0;
+	padding: 2rem 0;
+}
+
+@media (max-width: 720px) {
+	.page-wrapper {
+		padding: 1.5em 1em;
+	}
+	.page-main {
+		padding: 1rem 0;
+	}
+}
+
 .sr-only {
 	border: 0;
 	padding: 0;
