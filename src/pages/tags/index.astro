@@ -1,0 +1,151 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import LeftSidebar from '../../components/LeftSidebar.astro';
+import SearchOverlay from '../../components/SearchOverlay.astro';
+import { SITE_TITLE } from '../../consts';
+
+const allPosts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+// Collect tags with post counts
+const tagMap = new Map<string, typeof allPosts>();
+for (const post of allPosts) {
+	for (const tag of post.data.tags) {
+		if (!tagMap.has(tag)) tagMap.set(tag, []);
+		tagMap.get(tag)!.push(post);
+	}
+}
+const tags = Array.from(tagMap.entries())
+	.sort((a, b) => b[1].length - a[1].length)
+	.map(([name, posts]) => ({ name, count: posts.length }));
+
+const searchIndex = allPosts.map((p) => ({
+	id: p.id,
+	title: p.data.title,
+	description: p.data.description,
+	category: p.data.category ?? '',
+}));
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<BaseHead title={`Tags — ${SITE_TITLE}`} description="모든 태그 보기" />
+	</head>
+	<body>
+		<Header />
+		<SearchOverlay searchIndex={searchIndex} />
+		<div class="page-wrapper">
+			<LeftSidebar />
+			<main class="page-main">
+				<div class="page-header">
+					<h1>Tags</h1>
+					<p class="tag-total">{tags.length}개의 태그</p>
+				</div>
+
+				{tags.length === 0 ? (
+					<div class="empty-state">
+						<p>아직 태그가 없습니다.</p>
+						<p class="empty-hint">
+							포스트 프론트매터에 <code>tags: [태그명]</code> 을 추가하면 여기에 표시됩니다.
+						</p>
+					</div>
+				) : (
+					<div class="tags-cloud">
+						{tags.map((tag) => (
+							<span class="tag-chip">
+								<span class="tag-name">#{tag.name}</span>
+								<span class="tag-count">{tag.count}</span>
+							</span>
+						))}
+					</div>
+				)}
+			</main>
+		</div>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	main {
+		width: auto;
+		max-width: none;
+		margin: 0;
+	}
+
+	.page-header {
+		margin-bottom: 2rem;
+		display: flex;
+		align-items: baseline;
+		gap: 1rem;
+	}
+	.page-header h1 {
+		font-size: 2.2em;
+		margin: 0;
+	}
+	.tag-total {
+		font-size: 1em;
+		color: var(--text-muted);
+		margin: 0;
+	}
+
+	/* Empty state */
+	.empty-state {
+		background: var(--bg-card);
+		border: 1px dashed var(--border);
+		border-radius: 10px;
+		padding: 3rem;
+		text-align: center;
+		color: var(--text-muted);
+	}
+	.empty-state p { margin: 0 0 0.5em 0; }
+	.empty-hint {
+		font-size: 0.875em;
+	}
+	.empty-hint code {
+		background: var(--bg);
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		padding: 0.1em 0.4em;
+		font-size: 0.9em;
+	}
+
+	/* Tags cloud */
+	.tags-cloud {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+	}
+
+	.tag-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4em;
+		background: var(--bg-card);
+		border: 1px solid var(--border);
+		border-radius: 20px;
+		padding: 0.35em 0.8em 0.35em 0.9em;
+		cursor: default;
+		transition: border-color 0.15s ease, background-color 0.15s ease;
+	}
+	.tag-chip:hover {
+		border-color: var(--accent);
+		background-color: var(--accent-dim);
+	}
+	.tag-name {
+		font-size: 0.9em;
+		color: var(--text);
+	}
+	.tag-count {
+		font-size: 0.75em;
+		background: var(--border);
+		color: var(--text-muted);
+		border-radius: 10px;
+		padding: 0.05em 0.5em;
+		line-height: 1.6;
+	}
+</style>
