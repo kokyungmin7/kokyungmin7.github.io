@@ -3,76 +3,170 @@ import { SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
 ---
 
-<header>
-	<nav>
-		<a href="/" class="site-title">{SITE_TITLE}</a>
-		<div class="nav-right">
-			<div class="nav-links">
-				<HeaderLink href="/">Home</HeaderLink>
-				<HeaderLink href="/blog">Blog</HeaderLink>
-				<HeaderLink href="/projects">Projects</HeaderLink>
-				<HeaderLink href="/about">About</HeaderLink>
+<div class="header-shell" id="header-shell">
+	<header class="header-inner">
+		<div class="header-row">
+			<a href="/" class="brand">{SITE_TITLE}</a>
+			<nav class="nav-center" aria-label="Main navigation">
+				<div class="nav-pill">
+					<HeaderLink href="/" class="nav-pill-link">Home</HeaderLink>
+					<HeaderLink href="/blog" class="nav-pill-link">Blog</HeaderLink>
+					<HeaderLink href="/projects" class="nav-pill-link">Projects</HeaderLink>
+					<HeaderLink href="/about" class="nav-pill-link">About</HeaderLink>
+				</div>
+			</nav>
+			<div class="header-actions">
+				<button type="button" id="theme-toggle" aria-label="Toggle dark mode">
+					<svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="12" cy="12" r="5"></circle>
+						<line x1="12" y1="1" x2="12" y2="3"></line>
+						<line x1="12" y1="21" x2="12" y2="23"></line>
+						<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+						<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+						<line x1="1" y1="12" x2="3" y2="12"></line>
+						<line x1="21" y1="12" x2="23" y2="12"></line>
+						<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+						<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+					</svg>
+					<svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+					</svg>
+				</button>
 			</div>
-			<button id="theme-toggle" aria-label="Toggle dark mode">
-				<svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<circle cx="12" cy="12" r="5"></circle>
-					<line x1="12" y1="1" x2="12" y2="3"></line>
-					<line x1="12" y1="21" x2="12" y2="23"></line>
-					<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-					<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-					<line x1="1" y1="12" x2="3" y2="12"></line>
-					<line x1="21" y1="12" x2="23" y2="12"></line>
-					<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-					<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-				</svg>
-				<svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-				</svg>
-			</button>
 		</div>
-	</nav>
-</header>
+	</header>
+</div>
 
 <style>
-	header {
-		margin: 0;
-		padding: 0 1.5em;
-		background: var(--header-bg);
-		border-bottom: 1px solid var(--border);
-		transition: background-color 0.3s ease;
+	.header-shell {
 		position: sticky;
 		top: 0;
 		z-index: 100;
+		padding: 0;
+		background: transparent;
+		transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 	}
-	nav {
+
+	.header-inner {
+		max-width: 80rem;
+		margin: 0 auto;
+		padding: 0.75rem 1rem;
+	}
+
+	.header-row {
+		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		height: 56px;
-		max-width: 760px;
-		margin: auto;
+		min-height: 2.5rem;
 	}
-	.site-title {
-		font-weight: 700;
-		font-size: 1.05em;
-		color: var(--text);
+
+	.brand {
+		flex-shrink: 0;
+		font-weight: 500;
+		font-size: 0.875rem;
+		letter-spacing: 0.08em;
+		color: var(--brand-color);
 		text-decoration: none;
-		letter-spacing: -0.01em;
+		opacity: 0.9;
+		transition: opacity 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 	}
-	.site-title:hover {
-		color: var(--accent);
+
+	.brand:hover {
+		opacity: 1;
+		color: var(--brand-color);
 		text-decoration: none;
 	}
-	.nav-right {
+
+	.nav-center {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+		pointer-events: auto;
+	}
+
+	.nav-pill {
 		display: flex;
 		align-items: center;
-		gap: 0.5em;
+		gap: clamp(1rem, 3vw, 2rem);
+		height: 40px;
+		padding: 0 clamp(1rem, 3vw, 2rem);
+		border-radius: 1rem;
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		background-color: var(--glass-bg);
+		border: 1px solid var(--glass-border);
+		box-shadow: var(--glass-shadow);
 	}
-	.nav-links {
+
+	/* dailybeat .nav-button — 중앙에서 펼쳐지는 밑줄 */
+	.header-shell .nav-pill :global(a.nav-pill-link) {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		padding: 0 0.35rem;
+		border-radius: 0;
+		font-size: 14px;
+		font-weight: 500;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--nav-pill-muted);
+		background: none;
+		transition:
+			color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+			opacity 0.2s ease;
+	}
+
+	.header-shell .nav-pill :global(a.nav-pill-link::after) {
+		content: '';
+		pointer-events: none;
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		width: 0%;
+		height: 2px;
+		background-color: var(--nav-underline);
+		transition:
+			width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+			left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+	}
+
+	.header-shell .nav-pill :global(a.nav-pill-link:hover),
+	.header-shell .nav-pill :global(a.nav-pill-link:focus-visible) {
+		color: var(--nav-pill-hover);
+		background: none;
+		text-decoration: none;
+	}
+
+	.header-shell .nav-pill :global(a.nav-pill-link:hover::after),
+	.header-shell .nav-pill :global(a.nav-pill-link:focus-visible::after) {
+		width: 100%;
+		left: 0%;
+	}
+
+	.header-shell .nav-pill :global(a.nav-pill-link.active::after) {
+		width: 100%;
+		left: 0%;
+	}
+
+	.header-shell .nav-pill :global(a.nav-pill-link.active) {
+		color: var(--nav-pill-active);
+		font-weight: 500;
+		background: none;
+	}
+
+	.header-shell .nav-pill :global(a.nav-pill-link.active:hover) {
+		background: none;
+	}
+
+	.header-actions {
 		display: flex;
 		align-items: center;
-		gap: 0.25em;
+		gap: 0.5rem;
+		flex-shrink: 0;
+		opacity: 0.92;
 	}
+
 	#theme-toggle {
 		background: none;
 		border: none;
@@ -81,22 +175,69 @@ import HeaderLink from './HeaderLink.astro';
 		color: var(--text-muted);
 		display: flex;
 		align-items: center;
-		border-radius: 6px;
-		transition: background-color 0.2s ease, color 0.2s ease;
+		justify-content: center;
+		border-radius: 999px;
+		transition:
+			background-color 0.2s ease,
+			color 0.2s ease;
 	}
+
 	#theme-toggle:hover {
 		background-color: var(--accent-dim);
 		color: var(--accent);
 	}
+
 	#icon-sun,
 	#icon-moon {
 		display: none;
 	}
-	:global([data-theme="dark"]) #icon-sun {
+
+	:global([data-theme='dark']) #icon-sun {
 		display: block;
 	}
-	:global([data-theme="light"]) #icon-moon {
+
+	:global([data-theme='light']) #icon-moon {
 		display: block;
+	}
+
+	@media (max-width: 768px) {
+		.header-row {
+			display: grid;
+			grid-template-columns: 1fr auto;
+			grid-template-rows: auto auto;
+			gap: 0.75rem;
+			align-items: center;
+		}
+
+		.brand {
+			grid-column: 1;
+			grid-row: 1;
+		}
+
+		.header-actions {
+			grid-column: 2;
+			grid-row: 1;
+			justify-self: end;
+		}
+
+		.nav-center {
+			position: static;
+			transform: none;
+			grid-column: 1 / -1;
+			grid-row: 2;
+			display: flex;
+			justify-content: center;
+			width: 100%;
+		}
+
+		.nav-pill {
+			flex-wrap: wrap;
+			justify-content: center;
+			height: auto;
+			min-height: 40px;
+			padding: 0.5rem 1rem;
+			gap: 0.5rem 1rem;
+		}
 	}
 </style>
 
@@ -108,4 +249,22 @@ import HeaderLink from './HeaderLink.astro';
 		document.documentElement.setAttribute('data-theme', next);
 		localStorage.setItem('theme', next);
 	});
+
+	const shell = document.getElementById('header-shell');
+	let lastScrollY = window.scrollY;
+
+	window.addEventListener(
+		'scroll',
+		() => {
+			if (!shell) return;
+			const y = window.scrollY;
+			if (y < lastScrollY || y < 10) {
+				shell.style.transform = 'translateY(0)';
+			} else if (y > lastScrollY && y > 100) {
+				shell.style.transform = 'translateY(-100%)';
+			}
+			lastScrollY = y;
+		},
+		{ passive: true }
+	);
 </script>

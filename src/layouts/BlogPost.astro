@@ -35,81 +35,73 @@ const searchIndex = allPosts.map((p) => ({
 		<SearchOverlay searchIndex={searchIndex} />
 		<div class="page-wrapper">
 			<LeftSidebar currentCategory={category} />
-			<div class="post-area">
-				<!-- Main post content -->
-				<article class="post-main">
-					{heroImage && (
-						<div class="hero-image">
-							<Image width={1020} height={510} src={heroImage} alt="" />
-						</div>
-					)}
-					<div class="post-header">
-						<div class="post-meta-row">
-							<FormattedDate date={pubDate} />
-							{category && <span class="post-category">{category}</span>}
-							{updatedDate && (
-								<span class="updated-on">
-									수정: <FormattedDate date={updatedDate} />
-								</span>
-							)}
-						</div>
-						<h1>{title}</h1>
-						{description && <p class="post-description">{description}</p>}
-						<hr />
-					</div>
-					<div class="prose-content">
-						<slot />
-					</div>
-				</article>
 
-				<!-- Right Sidebar: TOC -->
-				<aside class="toc-sidebar">
-					<div class="toc-section" id="toc-container">
-						<h3 class="toc-title">목차</h3>
-						<ul class="toc-list" id="toc-list"></ul>
-						<p class="toc-empty" id="toc-empty">헤딩이 없습니다.</p>
+			<!-- Main post content -->
+			<article class="page-main post-main">
+				{heroImage && (
+					<div class="hero-image">
+						<Image width={1020} height={510} src={heroImage} alt="" />
 					</div>
-				</aside>
-			</div>
+				)}
+				<div class="post-header">
+					<div class="post-meta-row">
+						<FormattedDate date={pubDate} />
+						{category && <span class="post-category">{category}</span>}
+						{updatedDate && (
+							<span class="updated-on">
+								수정: <FormattedDate date={updatedDate} />
+							</span>
+						)}
+					</div>
+					<h1>{title}</h1>
+					{description && <p class="post-description">{description}</p>}
+					<hr />
+				</div>
+				<div class="prose-content">
+					<slot />
+				</div>
+			</article>
+
+			<!-- TOC: direct sibling of page-main so it stays fixed on the right -->
+			<aside class="toc-sidebar">
+				<div class="toc-section" id="toc-container">
+					<h3 class="toc-title">목차</h3>
+					<ul class="toc-list" id="toc-list"></ul>
+					<p class="toc-empty" id="toc-empty">헤딩이 없습니다.</p>
+				</div>
+			</aside>
 		</div>
 		<Footer />
 	</body>
 </html>
 
 <style>
-	/* Post area: main content + TOC */
-	.post-area {
-		flex: 1;
-		min-width: 0;
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) 200px;
-		gap: 2rem;
-		align-items: start;
-		padding: 2rem 0;
-	}
-
-	/* ── TOC sidebar ───────────────────── */
+	/* ── TOC sidebar: independent flex child of page-wrapper ── */
 	.toc-sidebar {
+		flex-shrink: 0;
+		width: 250px;
 		position: sticky;
 		top: 80px;
+		align-self: flex-start;
 		max-height: calc(100vh - 100px);
 		overflow-y: auto;
 		scrollbar-width: thin;
 		scrollbar-color: var(--border) transparent;
+		margin-left: 6rem;
 	}
 
 	.toc-section {
 		border-top: 1px solid var(--border);
-		padding-top: 1rem;
+		padding-top: 1.25rem;
 	}
 
 	.toc-title {
-		font-size: 0.72em;
+		font-size: 0.82em;
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		color: var(--text-muted);
-		margin: 0 0 0.75rem 0;
+		margin: 0 0 0.9rem 0;
 		padding-bottom: 0.75rem;
 		border-bottom: 1px solid var(--border);
 	}
@@ -132,9 +124,9 @@ const searchIndex = allPosts.map((p) => ({
 
 	:global(.toc-item) {
 		display: block;
-		padding: 0.3em 0.5em;
+		padding: 0.4em 0.6em;
 		border-radius: 5px;
-		font-size: 0.83em;
+		font-size: 0.92em;
 		color: var(--text-muted);
 		text-decoration: none;
 		line-height: 1.4;
@@ -143,13 +135,14 @@ const searchIndex = allPosts.map((p) => ({
 	}
 	:global(.toc-item:hover) {
 		color: var(--text);
-		background-color: var(--accent-dim);
+		background-color: var(--sidebar-list-hover-bg);
 		text-decoration: none;
 	}
 	:global(.toc-item.active) {
-		color: var(--accent);
-		border-left-color: var(--accent);
-		background-color: var(--accent-dim);
+		color: var(--sidebar-list-active-color);
+		border-left-color: var(--sidebar-list-indicator);
+		background-color: var(--sidebar-list-active-bg);
+		font-weight: 600;
 	}
 	:global(.toc-h3) {
 		padding-left: 1.2em;
@@ -157,7 +150,7 @@ const searchIndex = allPosts.map((p) => ({
 
 	/* ── Post main ─────────────────────── */
 	.post-main {
-		min-width: 0;
+		padding: 0 0 2rem 0;
 	}
 
 	.hero-image {
@@ -224,16 +217,7 @@ const searchIndex = allPosts.map((p) => ({
 	}
 
 	/* ── Responsive ─────────────────────── */
-	@media (max-width: 1100px) {
-		.post-area {
-			grid-template-columns: minmax(0, 1fr) 180px;
-		}
-	}
-
 	@media (max-width: 768px) {
-		.post-area {
-			grid-template-columns: 1fr;
-		}
 		.toc-sidebar {
 			display: none;
 		}
