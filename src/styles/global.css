@@ -1,5 +1,9 @@
 /* Spectre-inspired design */
 
+html.preload * {
+	transition: none !important;
+}
+
 :root {
 	/* Dark theme (default) */
 	--bg: #121212;
@@ -11,6 +15,26 @@
 	--accent-dim: rgba(140, 92, 245, 0.12);
 	--header-bg: #0e0e0e;
 	--box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+
+	/* 글래스 패널 (헤더 네비 pill · 사이드바 섹션 공통) */
+	--glass-bg: rgba(61, 70, 67, 0.5);
+	--glass-border: rgba(229, 223, 217, 0.2);
+	--glass-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+	--nav-pill-muted: #b0b8b2;
+	--nav-pill-active: #e8ebe9;
+	--nav-pill-hover: #e8ebe9;
+	--nav-underline: #e8ebe9;
+	--brand-color: #e8ebe9;
+
+	/* 링크 밑줄 애니메이션 (Uiverse hover-underline 패턴, scaleX) */
+	--link-underline-color: var(--nav-underline);
+
+	/* 목차·카테고리 목록 공통 (액센트 보라 대신 본문 톤) */
+	--sidebar-list-active-color: var(--text);
+	--sidebar-list-indicator: color-mix(in srgb, var(--text) 92%, transparent);
+	--sidebar-list-hover-bg: color-mix(in srgb, var(--text) 8%, transparent);
+	--sidebar-list-active-bg: color-mix(in srgb, var(--text) 11%, transparent);
 
 	/* legacy compat */
 	--black: 255, 255, 255;
@@ -29,6 +53,23 @@
 	--accent-dim: rgba(107, 63, 212, 0.08);
 	--header-bg: #ffffff;
 	--box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+	--glass-bg: rgba(255, 255, 255, 0.55);
+	--glass-border: rgba(0, 0, 0, 0.08);
+	--glass-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+
+	--nav-pill-muted: #5c6560;
+	--nav-pill-active: var(--text);
+	--nav-pill-hover: var(--text);
+	--nav-underline: var(--text);
+	--brand-color: var(--text);
+
+	--link-underline-color: var(--nav-underline);
+
+	--sidebar-list-active-color: var(--text);
+	--sidebar-list-indicator: color-mix(in srgb, var(--text) 88%, transparent);
+	--sidebar-list-hover-bg: color-mix(in srgb, var(--text) 6%, transparent);
+	--sidebar-list-active-bg: color-mix(in srgb, var(--text) 9%, transparent);
 
 	--black: 18, 18, 18;
 	--gray: 80, 80, 100;
@@ -71,6 +112,10 @@
 	box-sizing: border-box;
 }
 
+html {
+	scrollbar-gutter: stable;
+}
+
 body {
 	font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	margin: 0;
@@ -84,7 +129,7 @@ body {
 	overflow-wrap: break-word;
 }
 
-main {
+main:not(.page-main) {
 	width: 760px;
 	max-width: calc(100% - 2em);
 	margin: auto;
@@ -206,7 +251,7 @@ hr {
 	body {
 		font-size: 15px;
 	}
-	main {
+	main:not(.page-main) {
 		padding: 1.5em 1em;
 	}
 }
@@ -215,7 +260,7 @@ hr {
 .page-wrapper {
 	display: flex;
 	align-items: flex-start;
-	max-width: 1400px;
+	max-width: 1728px;
 	margin: 0 auto;
 	padding: 2.5em 1.5em;
 	gap: 0;
@@ -225,9 +270,17 @@ hr {
 	flex: 1;
 	min-width: 0;
 	width: auto;
-	max-width: none;
+	max-width: 978px;
 	margin: 0;
-	padding: 2rem 0;
+	padding: 0;
+}
+
+.page-header {
+	margin-bottom: 2rem;
+}
+.page-header h1 {
+	font-size: 2.2em;
+	margin: 0;
 }
 
 @media (max-width: 720px) {
@@ -235,7 +288,7 @@ hr {
 		padding: 1.5em 1em;
 	}
 	.page-main {
-		padding: 1rem 0;
+		padding: 0;
 	}
 }
 
@@ -250,4 +303,95 @@ hr {
 	clip: rect(1px, 1px, 1px, 1px);
 	clip-path: inset(50%);
 	white-space: nowrap;
+}
+
+/* Uiverse-style: 밑줄이 한쪽에서 펼쳐짐 (화살표 없음) */
+.hover-underline-link {
+	position: relative;
+	text-decoration: none;
+	padding-bottom: 6px;
+}
+
+.hover-underline-link::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 2px;
+	background-color: var(--link-underline-color);
+	transform: scaleX(0);
+	transform-origin: bottom right;
+	transition: transform 0.25s ease-out;
+	pointer-events: none;
+}
+
+.hover-underline-link:hover::after,
+.hover-underline-link:focus-visible::after {
+	transform: scaleX(1);
+	transform-origin: bottom left;
+}
+
+.hover-underline-link.active::after,
+.hover-underline-link.current::after {
+	transform: scaleX(1);
+	transform-origin: bottom left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.hover-underline-link::after {
+		transition: none;
+	}
+
+	.hover-underline-link:hover::after,
+	.hover-underline-link:focus-visible::after,
+	.hover-underline-link.active::after,
+	.hover-underline-link.current::after {
+		transform: scaleX(1);
+		transform-origin: bottom left;
+	}
+}
+
+/* ── KaTeX / 블로그 수식 (논문·교과서형 가독성) ───────────────────
+   katex.min.css는 BaseHead에서 로드. 여기서는 본문 톤·여백만 맞춤. */
+
+.prose-content .katex {
+	color: var(--text);
+	font-size: 1.07em;
+	word-break: normal;
+	overflow-wrap: normal;
+}
+
+.prose-content p .katex,
+.prose-content li .katex {
+	vertical-align: -0.15em;
+}
+
+.prose-content .katex-display {
+	margin: 1.65em 0;
+	padding: 1rem 1.35rem;
+	overflow-x: auto;
+	overflow-y: hidden;
+	-webkit-overflow-scrolling: touch;
+	text-align: center;
+	background: color-mix(in srgb, var(--text) 5%, transparent);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+}
+
+.prose-content .katex-display > .katex {
+	margin: 0 auto;
+	font-size: 1.12em;
+	line-height: 1.35;
+}
+
+.prose-content table th .katex,
+.prose-content table td .katex {
+	vertical-align: middle;
+	font-size: 1em;
+}
+
+.prose-content table th,
+.prose-content table td {
+	vertical-align: middle;
 }
