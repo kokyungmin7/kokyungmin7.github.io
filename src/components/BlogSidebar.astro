@@ -1,34 +1,18 @@
 ---
-import { getCollection } from 'astro:content';
 import FormattedDate from './FormattedDate.astro';
+import type { BlogCategorySummary, BlogPostEntry } from '../data/blog';
 
 interface Props {
 	currentCategory?: string;
+	categorySummaries: BlogCategorySummary[];
+	recentPosts: BlogPostEntry[];
 }
 
-const { currentCategory } = Astro.props;
-
+const { currentCategory, categorySummaries, recentPosts } = Astro.props;
 const currentPath = Astro.url.pathname;
-
-const allPosts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
-
-const categoryMap = new Map<string, number>();
-for (const post of allPosts) {
-	const cat = post.data.category ?? '일반';
-	categoryMap.set(cat, (categoryMap.get(cat) ?? 0) + 1);
-}
-const categories = [
-	{ name: '전체', count: allPosts.length },
-	...Array.from(categoryMap.entries()).map(([name, count]) => ({ name, count })),
-];
-
-const recentPosts = allPosts.slice(0, 5);
 ---
 
 <div class="sidebar-container" id="sidebar-container">
-	<!-- 버튼: 항상 상단 왼쪽에 고정 -->
 	<button class="toggle-btn" id="sidebar-toggle" aria-label="사이드바 접기/펼치기">
 		<div class="btn-icon">
 			<span class="line line-1"></span>
@@ -36,32 +20,31 @@ const recentPosts = allPosts.slice(0, 5);
 		</div>
 	</button>
 
-	<!-- 좌우로 접히는 콘텐츠 패널 -->
 	<div class="sidebar-panel" id="sidebar-panel">
-		<!-- Categories -->
 		<div class="sidebar-section sidebar-section--categories">
 			<h3 class="sidebar-title">카테고리</h3>
 			<ul class="category-list">
-				{categories.map((cat) => (
+				{categorySummaries.map((category) => (
 					<li>
 						<a
 							href="/blog"
 							class:list={[
 								'category-link',
 								{
-									active: cat.name === (currentCategory ?? '전체') && currentPath.startsWith('/blog'),
+									active:
+										category.name === (currentCategory ?? '전체') &&
+										currentPath.startsWith('/blog'),
 								},
 							]}
 						>
-							<span class="category-name">{cat.name}</span>
-							<span class="category-count">{cat.count}</span>
+							<span class="category-name">{category.name}</span>
+							<span class="category-count">{category.count}</span>
 						</a>
 					</li>
 				))}
 			</ul>
 		</div>
 
-		<!-- Recent Posts -->
 		<div class="sidebar-section sidebar-section--recent">
 			<h3 class="sidebar-title">최신 글</h3>
 			<ul class="recent-list">
@@ -79,7 +62,6 @@ const recentPosts = allPosts.slice(0, 5);
 			</ul>
 		</div>
 
-		<!-- Tags link -->
 		<a
 			href="/tags"
 			class:list={['tags-link', 'hover-underline-link', { active: currentPath.startsWith('/tags') }]}
@@ -90,11 +72,14 @@ const recentPosts = allPosts.slice(0, 5);
 </div>
 
 <script>
-	const container = document.getElementById('sidebar-container') as HTMLElement;
-	const toggleBtn = document.getElementById('sidebar-toggle') as HTMLButtonElement;
+	const container = document.getElementById('sidebar-container') as HTMLElement | null;
+	const toggleButton = document.getElementById('sidebar-toggle') as HTMLButtonElement | null;
 
 	function setCollapsed(collapsed: boolean, animate = true) {
+		if (!container) return;
+
 		if (!animate) container.classList.add('no-transition');
+
 		if (collapsed) {
 			container.classList.add('collapsed');
 			document.documentElement.classList.add('sidebar-collapsed');
@@ -102,18 +87,21 @@ const recentPosts = allPosts.slice(0, 5);
 			container.classList.remove('collapsed');
 			document.documentElement.classList.remove('sidebar-collapsed');
 		}
+
 		if (!animate) {
 			container.getBoundingClientRect();
 			container.classList.remove('no-transition');
 		}
+
 		localStorage.setItem('sidebar-collapsed', String(collapsed));
 	}
 
-	// Restore state without animation to avoid flash
-	const saved = localStorage.getItem('sidebar-collapsed');
-	if (saved === 'true') setCollapsed(true, false);
+	if (localStorage.getItem('sidebar-collapsed') === 'true') {
+		setCollapsed(true, false);
+	}
 
-	toggleBtn.addEventListener('click', () => {
+	toggleButton?.addEventListener('click', () => {
+		if (!container) return;
 		setCollapsed(!container.classList.contains('collapsed'));
 	});
 </script>
@@ -143,7 +131,6 @@ const recentPosts = allPosts.slice(0, 5);
 		transition: none !important;
 	}
 
-	/* 버튼: 항상 상단 왼쪽 */
 	.toggle-btn {
 		flex-shrink: 0;
 		align-self: flex-start;
@@ -180,7 +167,6 @@ const recentPosts = allPosts.slice(0, 5);
 		background: var(--accent);
 	}
 
-	/* 기본(펼침): X 아이콘 */
 	.toggle-btn .line-1 {
 		transform: translateY(-50%) rotate(45deg);
 	}
@@ -189,7 +175,6 @@ const recentPosts = allPosts.slice(0, 5);
 		transform: translateY(-50%) rotate(-45deg);
 	}
 
-	/* 접힌 상태: 햄버거 아이콘 */
 	.sidebar-container.collapsed .toggle-btn .line-1,
 	:global(html.sidebar-collapsed) .toggle-btn .line-1 {
 		transform: translateY(calc(-50% - 4px)) rotate(0deg);
@@ -200,7 +185,6 @@ const recentPosts = allPosts.slice(0, 5);
 		transform: translateY(calc(-50% + 4px)) rotate(0deg);
 	}
 
-	/* 좌우로 접히는 패널 */
 	.sidebar-panel {
 		width: 260px;
 		max-height: calc(100vh - 100px);
@@ -219,7 +203,6 @@ const recentPosts = allPosts.slice(0, 5);
 		transition: width 0.3s ease, opacity 0.15s ease;
 	}
 
-	/* Sidebar sections — 헤더 nav pill과 동일한 글래스 카드 */
 	.sidebar-section {
 		background: var(--glass-bg);
 		border: 1px solid var(--glass-border);
@@ -240,7 +223,6 @@ const recentPosts = allPosts.slice(0, 5);
 		margin: 0 0 0.9rem 0;
 	}
 
-	/* 목차(.toc-title)와 동일한 섹션 헤더 */
 	.sidebar-section--categories .sidebar-title,
 	.sidebar-section--recent .sidebar-title {
 		color: var(--text-muted);
@@ -249,8 +231,8 @@ const recentPosts = allPosts.slice(0, 5);
 		border-bottom: 1px solid var(--border);
 	}
 
-	/* Category list — 목차(.toc-item)와 동일 패턴 */
-	.category-list {
+	.category-list,
+	.recent-list {
 		list-style: none;
 		margin: 0;
 		padding: 0;
@@ -299,16 +281,6 @@ const recentPosts = allPosts.slice(0, 5);
 		color: var(--sidebar-list-active-color);
 	}
 
-	/* Recent posts — 카테고리·목차와 동일 패턴 */
-	.recent-list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
-	}
-
 	.recent-link {
 		display: flex;
 		flex-direction: column;
@@ -352,7 +324,6 @@ const recentPosts = allPosts.slice(0, 5);
 		color: var(--text-muted);
 	}
 
-	/* Tags link */
 	.tags-link.hover-underline-link {
 		padding-bottom: 0.65em;
 	}

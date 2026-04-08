@@ -1,21 +1,18 @@
 ---
+import type { BlogSearchEntry } from '../data/blog';
+
 interface Props {
-	searchIndex: Array<{
-		id: string;
-		title: string;
-		description: string;
-		category: string;
-	}>;
+	searchEntries: BlogSearchEntry[];
 }
 
-const { searchIndex } = Astro.props;
+const { searchEntries } = Astro.props;
 ---
 
 <div class="search-overlay" id="search-overlay" aria-hidden="true">
 	<div class="search-modal" role="dialog" aria-label="포스트 검색">
 		<div class="search-input-wrap">
 			<svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-				<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+				<circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
 			</svg>
 			<input
 				type="text"
@@ -32,23 +29,25 @@ const { searchIndex } = Astro.props;
 	</div>
 </div>
 
-<script define:vars={{ searchIndex }}>
+<script define:vars={{ searchEntries }}>
 	const overlay = document.getElementById('search-overlay');
-	const modal = document.querySelector('.search-modal');
 	const input = document.getElementById('search-input');
 	const results = document.getElementById('search-results');
 	const hint = document.getElementById('search-hint');
 	const empty = document.getElementById('search-empty');
 
-	function isInInput(el) {
+	function isTypingTarget(element) {
 		return (
-			el.tagName === 'INPUT' ||
-			el.tagName === 'TEXTAREA' ||
-			el.isContentEditable
+			element instanceof HTMLElement &&
+			(element.tagName === 'INPUT' ||
+				element.tagName === 'TEXTAREA' ||
+				element.isContentEditable)
 		);
 	}
 
 	function openSearch() {
+		if (!overlay || !input || !results || !hint || !empty) return;
+
 		overlay.style.display = 'flex';
 		overlay.setAttribute('aria-hidden', 'false');
 		input.value = '';
@@ -59,63 +58,71 @@ const { searchIndex } = Astro.props;
 	}
 
 	function closeSearch() {
+		if (!overlay) return;
+
 		overlay.style.display = 'none';
 		overlay.setAttribute('aria-hidden', 'true');
 	}
 
-	function highlight(text, query) {
+	function highlightMatchedText(text, query) {
 		if (!query) return text;
-		const idx = text.toLowerCase().indexOf(query.toLowerCase());
-		if (idx === -1) return text;
+
+		const matchedIndex = text.toLowerCase().indexOf(query.toLowerCase());
+		if (matchedIndex === -1) return text;
+
 		return (
-			text.slice(0, idx) +
+			text.slice(0, matchedIndex) +
 			'<mark>' +
-			text.slice(idx, idx + query.length) +
+			text.slice(matchedIndex, matchedIndex + query.length) +
 			'</mark>' +
-			text.slice(idx + query.length)
+			text.slice(matchedIndex + query.length)
 		);
 	}
 
-	function renderResults(filtered, q) {
+	function renderResults(filteredEntries, query) {
+		if (!results) return;
+
 		results.innerHTML = '';
-		filtered.forEach((post) => {
-			const li = document.createElement('li');
-			li.setAttribute('role', 'option');
-			const a = document.createElement('a');
-			a.href = `/blog/${post.id}/`;
-			a.innerHTML = `
-				<span class="result-title">${highlight(post.title, q)}</span>
-				${post.description ? `<span class="result-desc">${highlight(post.description, q)}</span>` : ''}
+		filteredEntries.forEach((post) => {
+			const listItem = document.createElement('li');
+			listItem.setAttribute('role', 'option');
+
+			const link = document.createElement('a');
+			link.href = `/blog/${post.id}/`;
+			link.innerHTML = `
+				<span class="result-title">${highlightMatchedText(post.title, query)}</span>
+				${post.description ? `<span class="result-desc">${highlightMatchedText(post.description, query)}</span>` : ''}
 				${post.category ? `<span class="result-cat">${post.category}</span>` : ''}
 			`;
-			a.addEventListener('click', closeSearch);
-			li.appendChild(a);
-			results.appendChild(li);
+			link.addEventListener('click', closeSearch);
+
+			listItem.appendChild(link);
+			results.appendChild(listItem);
 		});
 	}
 
-	// '/' key opens search
-	document.addEventListener('keydown', (e) => {
-		if (e.key === '/' && !isInInput(e.target)) {
-			e.preventDefault();
+	document.addEventListener('keydown', (event) => {
+		if (event.key === '/' && !isTypingTarget(event.target)) {
+			event.preventDefault();
 			openSearch();
 		}
-		if (e.key === 'Escape' && overlay.style.display !== 'none') {
+
+		if (event.key === 'Escape' && overlay instanceof HTMLElement && overlay.style.display !== 'none') {
 			closeSearch();
 		}
 	});
 
-	// Click outside modal closes overlay
-	overlay.addEventListener('click', (e) => {
-		if (e.target === overlay) closeSearch();
+	overlay?.addEventListener('click', (event) => {
+		if (event.target === overlay) closeSearch();
 	});
 
-	// Real-time filtering
-	input.addEventListener('input', () => {
-		const q = input.value.trim();
+	input?.addEventListener('input', () => {
+		if (!results || !hint || !empty || !input) return;
+
+		const query = input.value.trim();
 		results.innerHTML = '';
 
-		if (!q) {
+		if (!query) {
 			hint.style.display = 'block';
 			empty.style.display = 'none';
 			return;
@@ -123,20 +130,21 @@ const { searchIndex } = Astro.props;
 
 		hint.style.display = 'none';
 
-		const ql = q.toLowerCase();
-		const filtered = searchIndex.filter(
-			(p) =>
-				p.title.toLowerCase().includes(ql) ||
-				p.description.toLowerCase().includes(ql) ||
-				p.category.toLowerCase().includes(ql),
+		const normalizedQuery = query.toLowerCase();
+		const filteredEntries = searchEntries.filter(
+			(post) =>
+				post.title.toLowerCase().includes(normalizedQuery) ||
+				post.description.toLowerCase().includes(normalizedQuery) ||
+				post.category.toLowerCase().includes(normalizedQuery),
 		);
 
-		if (filtered.length === 0) {
+		if (filteredEntries.length === 0) {
 			empty.style.display = 'block';
-		} else {
-			empty.style.display = 'none';
-			renderResults(filtered, q);
+			return;
 		}
+
+		empty.style.display = 'none';
+		renderResults(filteredEntries, query);
 	});
 </script>
 
@@ -261,11 +269,10 @@ const { searchIndex } = Astro.props;
 	}
 
 	.search-message {
-		padding: 1.5rem;
-		text-align: center;
-		font-size: 0.875em;
-		color: var(--text-muted);
+		padding: 0.9rem 1.25rem 1.1rem;
 		margin: 0;
-		flex-shrink: 0;
+		color: var(--text-muted);
+		font-size: 0.88em;
+		border-top: 1px solid var(--border);
 	}
 </style>

@@ -1,0 +1,41 @@
+---
+import BlogSearchOverlay from '../components/BlogSearchOverlay.astro';
+import BlogSidebar from '../components/BlogSidebar.astro';
+import type { BlogCategorySummary, BlogPostEntry, BlogSearchEntry } from '../data/blog';
+import SiteLayout from './SiteLayout.astro';
+
+interface Props {
+	title: string;
+	description: string;
+	searchEntries: BlogSearchEntry[];
+	categorySummaries: BlogCategorySummary[];
+	recentPosts: BlogPostEntry[];
+	currentCategory?: string;
+	mainClass?: string;
+}
+
+const {
+	title,
+	description,
+	searchEntries,
+	categorySummaries,
+	recentPosts,
+	currentCategory,
+	mainClass,
+} = Astro.props;
+---
+
+<SiteLayout title={title} description={description}>
+	<BlogSearchOverlay searchEntries={searchEntries} />
+	<div class="page-wrapper">
+		<BlogSidebar
+			currentCategory={currentCategory}
+			categorySummaries={categorySummaries}
+			recentPosts={recentPosts}
+		/>
+		<main class:list={['page-main', mainClass]}>
+			<slot />
+		</main>
+		<slot name="pageAside" />
+	</div>
+</SiteLayout>
