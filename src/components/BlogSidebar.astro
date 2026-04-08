@@ -21,7 +21,7 @@ const currentPath = Astro.url.pathname;
 	</button>
 
 	<div class="sidebar-panel" id="sidebar-panel">
-		<div class="sidebar-section sidebar-section--categories">
+		<div class="sidebar-section sidebar-section--categories glass-panel">
 			<h3 class="sidebar-title">카테고리</h3>
 			<ul class="category-list">
 				{categorySummaries.map((category) => (
@@ -29,6 +29,7 @@ const currentPath = Astro.url.pathname;
 						<a
 							href="/blog"
 							class:list={[
+								'sidebar-nav-item',
 								'category-link',
 								{
 									active:
@@ -45,14 +46,14 @@ const currentPath = Astro.url.pathname;
 			</ul>
 		</div>
 
-		<div class="sidebar-section sidebar-section--recent">
+		<div class="sidebar-section sidebar-section--recent glass-panel">
 			<h3 class="sidebar-title">최신 글</h3>
 			<ul class="recent-list">
 				{recentPosts.map((post) => (
 					<li>
 						<a
 							href={`/blog/${post.id}/`}
-							class:list={['recent-link', { active: currentPath === `/blog/${post.id}/` }]}
+							class:list={['sidebar-nav-item', 'recent-link', { active: currentPath === `/blog/${post.id}/` }]}
 						>
 							<span class="recent-title">{post.data.title}</span>
 							<span class="recent-date"><FormattedDate date={post.data.pubDate} /></span>
@@ -64,7 +65,7 @@ const currentPath = Astro.url.pathname;
 
 		<a
 			href="/tags"
-			class:list={['tags-link', 'hover-underline-link', { active: currentPath.startsWith('/tags') }]}
+			class:list={['tags-link', 'glass-panel', 'hover-underline-link', { active: currentPath.startsWith('/tags') }]}
 		>
 			# 태그 보기
 		</a>
@@ -113,7 +114,7 @@ const currentPath = Astro.url.pathname;
 		align-items: flex-start;
 		flex-shrink: 0;
 		position: sticky;
-		top: 80px;
+		top: var(--header-height);
 		align-self: flex-start;
 		max-height: calc(100vh - 100px);
 		margin-right: 6rem;
@@ -204,14 +205,9 @@ const currentPath = Astro.url.pathname;
 	}
 
 	.sidebar-section {
-		background: var(--glass-bg);
-		border: 1px solid var(--glass-border);
 		border-radius: 1rem;
 		padding: 1.25rem;
 		margin-bottom: 0.9rem;
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		box-shadow: var(--glass-shadow);
 	}
 
 	.sidebar-title {
@@ -247,25 +243,6 @@ const currentPath = Astro.url.pathname;
 		align-items: center;
 		width: 100%;
 		box-sizing: border-box;
-		padding: 0.4em 0.6em;
-		border-radius: 5px;
-		text-decoration: none;
-		font-size: 0.92em;
-		line-height: 1.4;
-		color: var(--text-muted);
-		border-left: 2px solid transparent;
-		transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-	}
-	.category-link:hover {
-		color: var(--text);
-		background-color: var(--sidebar-list-hover-bg);
-		text-decoration: none;
-	}
-	.category-link.active {
-		color: var(--sidebar-list-active-color);
-		border-left-color: var(--sidebar-list-indicator);
-		background-color: var(--sidebar-list-active-bg);
-		font-weight: 600;
 	}
 
 	.category-count {
@@ -287,23 +264,9 @@ const currentPath = Astro.url.pathname;
 		gap: 0.15em;
 		width: 100%;
 		box-sizing: border-box;
-		padding: 0.4em 0.6em;
-		border-radius: 5px;
-		text-decoration: none;
-		line-height: 1.4;
-		border-left: 2px solid transparent;
-		transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-	}
-	.recent-link:hover {
-		background-color: var(--sidebar-list-hover-bg);
-		text-decoration: none;
 	}
 	.recent-link:hover .recent-title {
 		color: var(--text);
-	}
-	.recent-link.active {
-		border-left-color: var(--sidebar-list-indicator);
-		background-color: var(--sidebar-list-active-bg);
 	}
 	.recent-link.active .recent-title {
 		color: var(--sidebar-list-active-color);
@@ -332,11 +295,6 @@ const currentPath = Astro.url.pathname;
 		display: block;
 		padding: 0.6em 0.75em 0.65em;
 		border-radius: 1rem;
-		border: 1px solid var(--glass-border);
-		background: var(--glass-bg);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		box-shadow: var(--glass-shadow);
 		font-size: 0.85em;
 		color: var(--text-muted);
 		text-decoration: none;

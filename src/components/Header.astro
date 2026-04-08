@@ -8,7 +8,7 @@ import HeaderLink from './HeaderLink.astro';
 		<div class="header-row">
 			<a href="/" class="brand">{SITE_TITLE}</a>
 			<nav class="nav-center" aria-label="Main navigation">
-				<div class="nav-pill">
+				<div class="nav-pill glass-panel">
 					<HeaderLink href="/" class="nav-pill-link">Home</HeaderLink>
 					<HeaderLink href="/blog" class="nav-pill-link">Blog</HeaderLink>
 					<HeaderLink href="/projects" class="nav-pill-link">Projects</HeaderLink>
@@ -92,11 +92,6 @@ import HeaderLink from './HeaderLink.astro';
 		height: 40px;
 		padding: 0 clamp(1rem, 3vw, 2rem);
 		border-radius: 1rem;
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		background-color: var(--glass-bg);
-		border: 1px solid var(--glass-border);
-		box-shadow: var(--glass-shadow);
 	}
 
 	/* dailybeat .nav-button — 중앙에서 펼쳐지는 밑줄 */

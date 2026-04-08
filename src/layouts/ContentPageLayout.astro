@@ -85,7 +85,7 @@ const { title, description, heroImage, eyebrow, mainClass } = Astro.props;
 	.prose-content :global(h2),
 	.prose-content :global(h3),
 	.prose-content :global(h4) {
-		scroll-margin-top: 80px;
+		scroll-margin-top: var(--header-height);
 	}
 
 	@media (max-width: 720px) {

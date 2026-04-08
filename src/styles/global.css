@@ -7,6 +7,7 @@ html.preload * {
 :root {
 	/* Dark theme (default) */
 	--bg: #121212;
+	--header-height: 80px;
 	--bg-card: #1c1c1c;
 	--border: #353535;
 	--text: #ffffff;
@@ -424,4 +425,55 @@ hr {
 .prose-content table th,
 .prose-content table td {
 	vertical-align: middle;
+}
+
+/* ── Glass morphism panel ────────────────────────────────────────── */
+.glass-panel {
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	box-shadow: var(--glass-shadow);
+}
+
+/* ── Sidebar navigation list items ──────────────────────────────── */
+.sidebar-nav-item {
+	display: block;
+	padding: 0.4em 0.6em;
+	border-radius: 5px;
+	font-size: 0.92em;
+	color: var(--text-muted);
+	text-decoration: none;
+	line-height: 1.4;
+	border-left: 2px solid transparent;
+	transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+.sidebar-nav-item:hover {
+	color: var(--text);
+	background-color: var(--sidebar-list-hover-bg);
+	text-decoration: none;
+}
+.sidebar-nav-item.active {
+	color: var(--sidebar-list-active-color);
+	border-left-color: var(--sidebar-list-indicator);
+	background-color: var(--sidebar-list-active-bg);
+	font-weight: 600;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────── */
+.empty-state {
+	background: var(--bg-card);
+	border: 1px dashed var(--border);
+	border-radius: 10px;
+	padding: 3rem;
+	text-align: center;
+	color: var(--text-muted);
+}
+.empty-state p { margin: 0 0 0.5em 0; }
+.empty-state .empty-hint { font-size: 0.875em; }
+.empty-state .empty-hint code {
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: 4px;
+	padding: 0.1em 0.4em;
 }
