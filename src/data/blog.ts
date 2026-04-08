@@ -27,6 +27,8 @@ export interface BlogDataset {
 	tagSummaries: BlogTagSummary[];
 }
 
+type BlogDatasetBase = Omit<BlogDataset, 'recentPosts'>;
+
 function sortBlogPosts(posts: BlogPostEntry[]): BlogPostEntry[] {
 	return [...posts].sort(
 		(firstPost, secondPost) =>
@@ -34,44 +36,48 @@ function sortBlogPosts(posts: BlogPostEntry[]): BlogPostEntry[] {
 	);
 }
 
-let cachedBlogDataset: BlogDataset | undefined;
+let cachedBlogDatasetBase: BlogDatasetBase | undefined;
 
 export async function getBlogDataset(recentPostLimit = 5): Promise<BlogDataset> {
-	if (cachedBlogDataset) return cachedBlogDataset;
+	if (!cachedBlogDatasetBase) {
+		const posts = sortBlogPosts(await getCollection('blog'));
+		const searchEntries = posts.map((post) => ({
+			id: post.id,
+			title: post.data.title,
+			description: post.data.description,
+			category: post.data.category ?? '',
+		}));
+		const categoryCounts = new Map<string, number>();
+		const tagCounts = new Map<string, number>();
 
-	const posts = sortBlogPosts(await getCollection('blog'));
-	const searchEntries = posts.map((post) => ({
-		id: post.id,
-		title: post.data.title,
-		description: post.data.description,
-		category: post.data.category ?? '',
-	}));
-	const categoryCounts = new Map<string, number>();
-	const tagCounts = new Map<string, number>();
+		for (const post of posts) {
+			const categoryName = post.data.category ?? '일반';
+			categoryCounts.set(categoryName, (categoryCounts.get(categoryName) ?? 0) + 1);
 
-	for (const post of posts) {
-		const categoryName = post.data.category ?? '일반';
-		categoryCounts.set(categoryName, (categoryCounts.get(categoryName) ?? 0) + 1);
-
-		for (const tagName of post.data.tags) {
-			tagCounts.set(tagName, (tagCounts.get(tagName) ?? 0) + 1);
+			for (const tagName of post.data.tags) {
+				tagCounts.set(tagName, (tagCounts.get(tagName) ?? 0) + 1);
+			}
 		}
+
+		cachedBlogDatasetBase = {
+			posts,
+			searchEntries,
+			categorySummaries: [
+				{ name: '전체', count: posts.length },
+				...Array.from(categoryCounts.entries()).map(([name, count]) => ({ name, count })),
+			],
+			tagSummaries: Array.from(tagCounts.entries())
+				.sort((firstTag, secondTag) => secondTag[1] - firstTag[1])
+				.map(([name, count]) => ({ name, count })),
+		};
 	}
 
-	cachedBlogDataset = {
-		posts,
-		recentPosts: posts.slice(0, recentPostLimit),
-		searchEntries,
-		categorySummaries: [
-			{ name: '전체', count: posts.length },
-			...Array.from(categoryCounts.entries()).map(([name, count]) => ({ name, count })),
-		],
-		tagSummaries: Array.from(tagCounts.entries())
-			.sort((firstTag, secondTag) => secondTag[1] - firstTag[1])
-			.map(([name, count]) => ({ name, count })),
-	};
+	const datasetBase = cachedBlogDatasetBase;
 
-	return cachedBlogDataset;
+	return {
+		...datasetBase,
+		recentPosts: datasetBase.posts.slice(0, recentPostLimit),
+	};
 }
 
 export async function getSortedBlogPosts(): Promise<BlogPostEntry[]> {

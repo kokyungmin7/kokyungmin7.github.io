@@ -13,9 +13,9 @@ const { tagSummaries, recentPosts, searchEntries, categorySummaries } = await ge
 	categorySummaries={categorySummaries}
 	recentPosts={recentPosts}
 >
-	<div class="page-header">
+	<div class="page-header page-header--inline">
 		<h1>Tags</h1>
-		<p class="tag-total">{tagSummaries.length}개의 태그</p>
+		<p class="page-header-copy">{tagSummaries.length}개의 태그</p>
 	</div>
 
 	{tagSummaries.length === 0 ? (
@@ -42,43 +42,6 @@ const { tagSummaries, recentPosts, searchEntries, categorySummaries } = await ge
 		width: auto;
 		max-width: none;
 		margin: 0;
-	}
-
-	.page-header {
-		margin-bottom: 2rem;
-		display: flex;
-		align-items: baseline;
-		gap: 1rem;
-	}
-	.page-header h1 {
-		font-size: 2.2em;
-		margin: 0;
-	}
-	.tag-total {
-		font-size: 1em;
-		color: var(--text-muted);
-		margin: 0;
-	}
-
-	/* Empty state */
-	.empty-state {
-		background: var(--bg-card);
-		border: 1px dashed var(--border);
-		border-radius: 10px;
-		padding: 3rem;
-		text-align: center;
-		color: var(--text-muted);
-	}
-	.empty-state p { margin: 0 0 0.5em 0; }
-	.empty-hint {
-		font-size: 0.875em;
-	}
-	.empty-hint code {
-		background: var(--bg);
-		border: 1px solid var(--border);
-		border-radius: 4px;
-		padding: 0.1em 0.4em;
-		font-size: 0.9em;
 	}
 
 	/* Tags cloud */
