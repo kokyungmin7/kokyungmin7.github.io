@@ -1,66 +1,25 @@
 ---
-import { getCollection } from 'astro:content';
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
-import Header from '../../components/Header.astro';
-import LeftSidebar from '../../components/LeftSidebar.astro';
-import SearchOverlay from '../../components/SearchOverlay.astro';
+import BlogPostList from '../../components/BlogPostList.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { getBlogDataset } from '../../data/blog';
+import BlogSectionLayout from '../../layouts/BlogSectionLayout.astro';
 
-const allPosts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
-
-const searchIndex = allPosts.map((p) => ({
-	id: p.id,
-	title: p.data.title,
-	description: p.data.description,
-	category: p.data.category ?? '',
-}));
+const { posts, recentPosts, searchEntries, categorySummaries } = await getBlogDataset();
 ---
 
-<!doctype html>
-<html lang="ko">
-	<head>
-		<BaseHead title={`Blog — ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<SearchOverlay searchIndex={searchIndex} />
-		<div class="page-wrapper">
-			<LeftSidebar />
-			<main class="page-main">
-				<div class="page-header">
-					<h1>Blog</h1>
-					<p class="post-count">{allPosts.length}개의 포스트</p>
-				</div>
-				<ul class="post-list">
-					{
-						allPosts.map((post) => (
-							<li>
-								<a href={`/blog/${post.id}/`} class="post-card">
-									<div class="post-body">
-										<h2 class="post-title">{post.data.title}</h2>
-										{post.data.description && (
-											<p class="post-desc">{post.data.description}</p>
-										)}
-									</div>
-									<div class="post-meta">
-										<span class="post-date">
-											<FormattedDate date={post.data.pubDate} />
-										</span>
-									</div>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</main>
-		</div>
-		<Footer />
-	</body>
-</html>
+<BlogSectionLayout
+	title={`Blog — ${SITE_TITLE}`}
+	description={SITE_DESCRIPTION}
+	searchEntries={searchEntries}
+	categorySummaries={categorySummaries}
+	recentPosts={recentPosts}
+>
+	<div class="page-header">
+		<h1>Blog</h1>
+		<p class="post-count">{posts.length}개의 포스트</p>
+	</div>
+	<BlogPostList posts={posts} />
+</BlogSectionLayout>
 
 <style>
 	.page-header {
@@ -73,72 +32,8 @@ const searchIndex = allPosts.map((p) => ({
 		color: var(--text-muted);
 		margin: 0;
 	}
-	.post-list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-	}
-	.post-card {
-		display: flex;
-		align-items: stretch;
-		background: var(--bg-card);
-		border: 1px solid var(--border);
-		border-radius: 10px;
-		text-decoration: none;
-		overflow: hidden;
-		transition: border-color 0.2s ease, background-color 0.2s ease;
-	}
-	.post-card:hover {
-		border-color: var(--accent);
-		background-color: var(--accent-dim);
-		text-decoration: none;
-	}
-	.post-body {
-		flex: 1;
-		min-width: 0;
-		padding: 1.4rem 1.6rem;
-	}
-	.post-title {
-		font-size: 1.2em;
-		font-weight: 600;
-		color: var(--text);
-		margin: 0 0 0.4rem 0;
-		line-height: 1.35;
-	}
-	.post-desc {
-		font-size: 1em;
-		color: var(--text-muted);
-		margin: 0;
-		overflow: hidden;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-	}
-	.post-meta {
-		flex-shrink: 0;
-		display: flex;
-		align-items: center;
-		padding: 1.4rem;
-		border-left: 1px solid var(--border);
-	}
-	.post-date {
-		font-size: 0.9em;
-		color: var(--text-muted);
-		white-space: nowrap;
-	}
 
 	@media (max-width: 600px) {
-		.post-card {
-			flex-direction: column;
-		}
-		.post-meta {
-			border-left: none;
-			border-top: 1px solid var(--border);
-			padding: 0.75rem 1.4rem;
-		}
 		.page-header {
 			flex-direction: column;
 			gap: 0.25rem;
