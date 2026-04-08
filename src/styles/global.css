@@ -460,20 +460,3 @@ hr {
 	font-weight: 600;
 }
 
-/* ── Empty state ─────────────────────────────────────────────────── */
-.empty-state {
-	background: var(--bg-card);
-	border: 1px dashed var(--border);
-	border-radius: 10px;
-	padding: 3rem;
-	text-align: center;
-	color: var(--text-muted);
-}
-.empty-state p { margin: 0 0 0.5em 0; }
-.empty-state .empty-hint { font-size: 0.875em; }
-.empty-state .empty-hint code {
-	background: var(--bg);
-	border: 1px solid var(--border);
-	border-radius: 4px;
-	padding: 0.1em 0.4em;
-}
