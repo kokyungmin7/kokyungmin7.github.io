@@ -41,21 +41,22 @@
 
 	.sidebar-toggle .chevron-right {
 		position: absolute;
-		transform: rotate(0deg);
+		transform: rotate(180deg);
 		transition: color 0.2s ease;
 	}
 
-	.sidebar-toggle input:checked ~ .chevron-right {
-		transform: rotate(180deg);
+	:global(html.sidebar-collapsed) .sidebar-toggle .chevron-right {
+		transform: rotate(0deg);
 	}
 
 	.sidebar-toggle.is-animating .chevron-right {
-		animation: chevron-return 0.5s backwards;
-	}
-
-	.sidebar-toggle.is-animating input:checked ~ .chevron-right {
 		animation: chevron-rotate 0.5s backwards;
 		transform: rotate(180deg);
+	}
+
+	:global(html.sidebar-collapsed) .sidebar-toggle.is-animating .chevron-right {
+		animation: chevron-return 0.5s backwards;
+		transform: rotate(0deg);
 	}
 
 	.sidebar-toggle input {
@@ -67,14 +68,11 @@
 	}
 
 	/* 초기 로드 시 애니메이션 방지 */
-	.sidebar-toggle.no-animate .chevron-right,
-	.sidebar-toggle.no-animate input:checked ~ .chevron-right {
+	.sidebar-toggle.no-animate .chevron-right {
 		animation: none !important;
 	}
-	.sidebar-toggle.no-animate input:checked ~ .chevron-right {
-		transform: rotate(180deg);
-	}
-	.sidebar-toggle.no-animate .chevron-right {
+
+	:global(html.sidebar-collapsed) .sidebar-toggle.no-animate .chevron-right {
 		transform: rotate(0deg);
 	}
 
