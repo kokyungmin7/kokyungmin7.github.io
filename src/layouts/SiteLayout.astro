@@ -1,14 +1,17 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
+import BlogSidebar from '../components/BlogSidebar.astro';
+import { getBlogDataset } from '../data/blog';
 
 interface Props {
 	title: string;
 	description: string;
+	currentCategory?: string;
+	currentSubcategory?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, currentCategory, currentSubcategory } = Astro.props;
+const { categoryTree, recentPosts } = await getBlogDataset();
 ---
 
 <!doctype html>
@@ -17,8 +20,24 @@ const { title, description } = Astro.props;
 		<BaseHead title={title} description={description} />
 	</head>
 	<body>
-		<Header />
-		<slot />
-		<Footer />
+		<div class="site-layout">
+			<BlogSidebar categoryTree={categoryTree} recentPosts={recentPosts} currentCategory={currentCategory} currentSubcategory={currentSubcategory} />
+			<div class="site-content">
+				<slot />
+			</div>
+		</div>
 	</body>
 </html>
+
+<style>
+	.site-layout {
+		display: flex;
+		align-items: flex-start;
+		min-height: 100vh;
+	}
+
+	.site-content {
+		flex: 1;
+		min-width: 0;
+	}
+</style>

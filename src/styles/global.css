@@ -6,21 +6,22 @@ html.preload * {
 
 :root {
 	/* Dark theme (default) */
-	--bg: #121212;
-	--header-height: 80px;
-	--bg-card: #1c1c1c;
-	--border: #353535;
+	--bg: #080808;
+	--header-height: 0px;
+	--bg-card: #181818;
+	--border: #2a2a2a;
 	--text: #ffffff;
-	--text-muted: #c7c7c7;
-	--accent: #8c5cf5;
-	--accent-dim: rgba(140, 92, 245, 0.12);
-	--header-bg: #0e0e0e;
-	--box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+	--text-muted: #cacaca;
+	--accent: #f23827;
+	--accent-hover: #fc4926;
+	--accent-dim: rgba(242, 56, 39, 0.12);
+	--header-bg: #080808;
+	--box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
 
 	/* 글래스 패널 (헤더 네비 pill · 사이드바 섹션 공통) */
-	--glass-bg: rgba(61, 70, 67, 0.5);
-	--glass-border: rgba(229, 223, 217, 0.2);
-	--glass-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	--glass-bg: rgba(24, 24, 24, 0.75);
+	--glass-border: rgba(255, 255, 255, 0.08);
+	--glass-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 
 	--nav-pill-muted: #b0b8b2;
 	--nav-pill-active: #e8ebe9;
@@ -31,11 +32,11 @@ html.preload * {
 	/* 링크 밑줄 애니메이션 (Uiverse hover-underline 패턴, scaleX) */
 	--link-underline-color: var(--nav-underline);
 
-	/* 목차·카테고리 목록 공통 (액센트 보라 대신 본문 톤) */
+	/* 목차·카테고리 목록 공통 */
 	--sidebar-list-active-color: var(--text);
-	--sidebar-list-indicator: color-mix(in srgb, var(--text) 92%, transparent);
+	--sidebar-list-indicator: #fc4926;
 	--sidebar-list-hover-bg: color-mix(in srgb, var(--text) 8%, transparent);
-	--sidebar-list-active-bg: color-mix(in srgb, var(--text) 11%, transparent);
+	--sidebar-list-active-bg: rgba(252, 73, 38, 0.08);
 
 	/* legacy compat */
 	--black: 255, 255, 255;
@@ -50,8 +51,9 @@ html.preload * {
 	--border: #e0e0e0;
 	--text: #121212;
 	--text-muted: #555555;
-	--accent: #6b3fd4;
-	--accent-dim: rgba(107, 63, 212, 0.08);
+	--accent: #f23827;
+	--accent-hover: #fc4926;
+	--accent-dim: rgba(242, 56, 39, 0.08);
 	--header-bg: #ffffff;
 	--box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
@@ -68,9 +70,9 @@ html.preload * {
 	--link-underline-color: var(--nav-underline);
 
 	--sidebar-list-active-color: var(--text);
-	--sidebar-list-indicator: color-mix(in srgb, var(--text) 88%, transparent);
+	--sidebar-list-indicator: #fc4926;
 	--sidebar-list-hover-bg: color-mix(in srgb, var(--text) 6%, transparent);
-	--sidebar-list-active-bg: color-mix(in srgb, var(--text) 9%, transparent);
+	--sidebar-list-active-bg: rgba(252, 73, 38, 0.06);
 
 	--black: 18, 18, 18;
 	--gray: 80, 80, 100;
@@ -213,7 +215,7 @@ pre > code {
 }
 
 blockquote {
-	border-left: 3px solid var(--accent);
+	border-left: 3px solid #fc4926;
 	padding: 0.5em 0 0.5em 1.25em;
 	margin: 1.5em 0;
 	color: var(--text-muted);
@@ -248,9 +250,8 @@ hr {
 .page-wrapper {
 	display: flex;
 	align-items: flex-start;
-	max-width: 1728px;
-	margin: 0 auto;
-	padding: 2.5em 1.5em;
+	margin: 0;
+	padding: 0;
 	gap: 0;
 }
 
@@ -258,9 +259,9 @@ hr {
 	flex: 1;
 	min-width: 0;
 	width: auto;
-	max-width: 978px;
+	max-width: 1272px;
 	margin: 0;
-	padding: 0;
+	padding: 2.5em 1.5em;
 }
 
 .page-header {
@@ -310,11 +311,8 @@ hr {
 }
 
 @media (max-width: 720px) {
-	.page-wrapper {
-		padding: 1.5em 1em;
-	}
 	.page-main {
-		padding: 0;
+		padding: 1.5em 1em;
 	}
 
 	.page-header--inline {
