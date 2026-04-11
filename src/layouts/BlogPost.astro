@@ -8,16 +8,13 @@ import BlogSectionLayout from './BlogSectionLayout.astro';
 type Props = CollectionEntry<'blog'>['data'];
 
 const { title, description, pubDate, updatedDate, heroImage, category } = Astro.props;
-const { recentPosts, searchEntries, categorySummaries } = await getBlogDataset();
+const { searchEntries } = await getBlogDataset();
 ---
 
 <BlogSectionLayout
 	title={title}
 	description={description}
 	searchEntries={searchEntries}
-	categorySummaries={categorySummaries}
-	recentPosts={recentPosts}
-	currentCategory={category}
 	mainClass="post-main"
 >
 	<article>
