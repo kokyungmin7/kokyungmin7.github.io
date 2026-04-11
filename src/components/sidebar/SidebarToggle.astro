@@ -1,0 +1,95 @@
+---
+---
+
+<div class="panel-header">
+	<label class="sidebar-toggle" id="sidebar-toggle-label" aria-label="사이드바 토글">
+		<input type="checkbox" id="sidebar-checkbox" />
+		<svg class="chevron-right" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M9 6l6 6-6 6" />
+		</svg>
+	</label>
+</div>
+
+<style>
+	/* ── 패널 헤더 ── */
+	/* height 고정: nav 아이템(0.5rem+40px+0.5rem=56px)과 동일 → 접힘/펼침 시 첫 아이콘 위치 불변 */
+	.panel-header {
+		display: flex;
+		align-items: center;
+		height: 64px;
+		padding: 0 0.75rem;
+	}
+
+	/* ── 사이드바 토글 (Uiverse chevron) ── */
+	.sidebar-toggle {
+		--color: rgba(255, 255, 255, 0.45);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		position: relative;
+		cursor: pointer;
+		user-select: none;
+		color: var(--color);
+		width: 28px;
+		height: 28px;
+		flex-shrink: 0;
+	}
+
+	.sidebar-toggle:hover {
+		color: rgba(255, 255, 255, 0.9);
+	}
+
+	.sidebar-toggle .chevron-right {
+		position: absolute;
+		animation: chevron-return 0.5s backwards;
+		transition: color 0.2s ease;
+	}
+
+	.sidebar-toggle input:checked ~ .chevron-right {
+		animation: chevron-rotate 0.5s backwards;
+		transform: rotate(180deg);
+	}
+
+	.sidebar-toggle input {
+		position: absolute;
+		opacity: 0;
+		cursor: pointer;
+		height: 0;
+		width: 0;
+	}
+
+	/* 초기 로드 시 애니메이션 방지 */
+	.sidebar-toggle.no-animate .chevron-right,
+	.sidebar-toggle.no-animate input:checked ~ .chevron-right {
+		animation: none !important;
+	}
+	.sidebar-toggle.no-animate input:checked ~ .chevron-right {
+		transform: rotate(180deg);
+	}
+	.sidebar-toggle.no-animate .chevron-right {
+		transform: rotate(0deg);
+	}
+
+	/* collapsed 상태: 패널 헤더 — 아이콘 수평 중앙 정렬 */
+	:global(html.sidebar-collapsed) .panel-header {
+		padding: 0;
+		justify-content: center;
+	}
+
+	/* collapsed 상태: 토글 버튼 크기 확장 */
+	:global(html.sidebar-collapsed) .sidebar-toggle {
+		width: 40px;
+		height: 40px;
+		border-radius: 10px;
+	}
+
+	@keyframes chevron-rotate {
+		0%   { transform: rotate(0deg);   opacity: 0; }
+		100% { transform: rotate(180deg); }
+	}
+
+	@keyframes chevron-return {
+		0%   { transform: rotate(180deg); opacity: 0; }
+		100% { transform: rotate(0deg); }
+	}
+</style>

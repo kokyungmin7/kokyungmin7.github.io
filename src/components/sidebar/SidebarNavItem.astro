@@ -1,0 +1,145 @@
+---
+interface Props {
+	href: string;
+	label: string;
+	icon: string;
+	active: boolean;
+}
+
+const { href, label, icon, active } = Astro.props;
+---
+
+<a href={href} class:list={['site-nav-item', { active }]}>
+	<span class="nav-icon" set:html={icon} />
+	<span class="nav-label">{label}</span>
+	{active && <span class="active-dot" aria-hidden="true"></span>}
+</a>
+
+<script>
+	import { gsap } from 'gsap';
+
+	function splitLabels() {
+		document.querySelectorAll<HTMLElement>('.nav-label').forEach((label) => {
+			if (label.querySelector('.nav-char')) return; // 이미 분리됨
+			const chars = [...(label.textContent ?? '')];
+			label.textContent = '';
+			chars.forEach((char) => {
+				const span = document.createElement('span');
+				span.className = 'nav-char';
+				span.style.display = 'inline-block';
+				span.textContent = char;
+				label.appendChild(span);
+			});
+		});
+	}
+
+	splitLabels();
+
+	window.addEventListener('sidebar:expanded', () => {
+		const expandChars = document.querySelectorAll<HTMLElement>('.nav-char');
+		const expandDots = document.querySelectorAll<HTMLElement>('.active-dot');
+		gsap.set([...expandChars, ...expandDots], { opacity: 0, y: 30 });
+		setTimeout(() => {
+			gsap.fromTo(
+				[...expandChars, ...expandDots],
+				{ opacity: 0, y: 30 },
+				{ opacity: 1, y: 0, duration: 0.5, ease: 'power3.out', stagger: 0.025 },
+			);
+		}, 300);
+	});
+</script>
+
+<style>
+	/* ── nav 아이템 ── */
+	.site-nav-item {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.75rem 0.75rem;
+		text-decoration: none;
+		color: #a0a0a0;
+		transition: color 0.2s ease, background 0.2s ease;
+	}
+
+	.site-nav-item:hover {
+		color: #e8e8e8;
+		background: rgba(255, 255, 255, 0.03);
+		text-decoration: none;
+	}
+
+	.site-nav-item.active {
+		color: #ebebeb;
+	}
+
+	/* ── 아이콘 컨테이너 — 항상 40×40 고정 ── */
+	.nav-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 40px;
+		height: 40px;
+		opacity: 0.6;
+		transition: opacity 0.2s ease;
+	}
+
+	.site-nav-item:hover .nav-icon,
+	.site-nav-item.active .nav-icon {
+		opacity: 1;
+	}
+
+	/* ── nav 레이블 ── */
+	.nav-label {
+		font-size: 2rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+		line-height: 1;
+		overflow: hidden;
+		white-space: nowrap;
+		max-width: 300px;
+		opacity: 1;
+		transition: max-width 0s;
+	}
+
+	/* ── active dot ── */
+	.active-dot {
+		display: block;
+		width: 9px;
+		height: 9px;
+		background: var(--accent);
+		border-radius: 1px;
+		flex-shrink: 0;
+		margin-bottom: 0.1em;
+		opacity: 1;
+	}
+
+	/* ── collapsed 상태 오버라이드 ── */
+
+	/* active-dot을 layout에서 제거 — icon 중앙 정렬 보장 */
+	:global(html.sidebar-collapsed) .active-dot {
+		display: none;
+	}
+
+	:global(html.sidebar-collapsed) .nav-icon {
+		border-radius: 10px;
+		opacity: 1;
+		background: transparent;
+		transition: background 0.2s ease;
+	}
+
+	:global(html.sidebar-collapsed) .site-nav-item:hover .nav-icon {
+		background: rgba(255, 255, 255, 0.07);
+	}
+
+	:global(html.sidebar-collapsed) .site-nav-item.active .nav-icon {
+		background: rgba(255, 255, 255, 0.13);
+	}
+
+	:global(html.sidebar-collapsed) .nav-label {
+		max-width: 0;
+		opacity: 0;
+		transition: max-width 0s, opacity 0.1s ease;
+	}
+
+</style>
