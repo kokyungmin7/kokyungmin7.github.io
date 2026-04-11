@@ -70,6 +70,18 @@ const siteNav = [
 	const container = document.getElementById('sidebar-container') as HTMLElement | null;
 	const toggleLabel = document.getElementById('sidebar-toggle-label') as HTMLLabelElement | null;
 	const checkbox = document.getElementById('sidebar-checkbox') as HTMLInputElement | null;
+	const toggleAnimationMs = 500;
+
+	function animateToggle() {
+		if (!toggleLabel) return;
+
+		toggleLabel.classList.remove('is-animating');
+		toggleLabel.getBoundingClientRect();
+		toggleLabel.classList.add('is-animating');
+		window.setTimeout(() => {
+			toggleLabel.classList.remove('is-animating');
+		}, toggleAnimationMs);
+	}
 
 	function setCollapsed(collapsed: boolean, animate = true) {
 		if (!container) return;
@@ -103,10 +115,14 @@ const siteNav = [
 	if (isCollapsed) {
 		setCollapsed(true, false);
 	} else {
+		toggleLabel?.classList.add('no-animate');
 		if (checkbox) checkbox.checked = true;
+		container?.getBoundingClientRect();
+		toggleLabel?.classList.remove('no-animate');
 	}
 
 	checkbox?.addEventListener('change', () => {
+		animateToggle();
 		const nowCollapsed = !checkbox.checked;
 		setCollapsed(nowCollapsed);
 

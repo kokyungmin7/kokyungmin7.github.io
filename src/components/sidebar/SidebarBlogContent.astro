@@ -93,6 +93,26 @@ const { categoryTree, recentPosts, currentPath, currentCategory, currentSubcateg
 	import { gsap } from 'gsap';
 
 	const blogContent = document.querySelector('.blog-content') as HTMLElement | null;
+	const sidebarItems = blogContent
+		? blogContent.querySelectorAll<HTMLElement>(
+			'.blog-section-title, .category-header, .subcategory-link, .recent-link, .tags-link',
+		)
+		: [];
+
+	function animateSidebarItems() {
+		if (!blogContent?.classList.contains('blog-content--visible') || sidebarItems.length === 0) return;
+
+		gsap.set(sidebarItems, { opacity: 0, y: 30 });
+		window.setTimeout(() => {
+			gsap.fromTo(
+				sidebarItems,
+				{ opacity: 0, y: 30 },
+				{ opacity: 1, y: 0, duration: 0.5, ease: 'power3.out', stagger: 0.025 },
+			);
+		}, 300);
+	}
+
+	window.addEventListener('sidebar:expanded', animateSidebarItems);
 
 	if (blogContent?.classList.contains('blog-content--visible')) {
 		const items = Array.from(blogContent.children) as HTMLElement[];
@@ -129,7 +149,7 @@ const { categoryTree, recentPosts, currentPath, currentCategory, currentSubcateg
 					gsap.to(items, {
 						opacity: 0,
 						y: -20,
-						duration: 0.35,
+						duration: 0.01,
 						ease: 'power2.in',
 						stagger: 0.06,
 						onComplete: () => { window.location.href = href; },

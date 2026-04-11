@@ -41,11 +41,19 @@
 
 	.sidebar-toggle .chevron-right {
 		position: absolute;
-		animation: chevron-return 0.5s backwards;
+		transform: rotate(0deg);
 		transition: color 0.2s ease;
 	}
 
 	.sidebar-toggle input:checked ~ .chevron-right {
+		transform: rotate(180deg);
+	}
+
+	.sidebar-toggle.is-animating .chevron-right {
+		animation: chevron-return 0.5s backwards;
+	}
+
+	.sidebar-toggle.is-animating input:checked ~ .chevron-right {
 		animation: chevron-rotate 0.5s backwards;
 		transform: rotate(180deg);
 	}
