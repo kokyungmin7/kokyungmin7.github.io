@@ -1,6 +1,5 @@
 ---
-import BlogPostList from '../components/BlogPostList.astro';
-import ProfileCard from '../components/ProfileCard.astro';
+import ComingSoonPage from '../components/ComingSoonPage.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { getBlogDataset } from '../data/blog';
 import BlogSectionLayout from '../layouts/BlogSectionLayout.astro';
@@ -15,49 +14,5 @@ const { recentPosts, searchEntries, categorySummaries } = await getBlogDataset()
 	categorySummaries={categorySummaries}
 	recentPosts={recentPosts}
 >
-	<div class="page-header">
-		<h1>Home</h1>
-		<p class="page-header-copy">블로그 포스트와 개인 프로젝트를 함께 정리하는 허브입니다.</p>
-	</div>
-	<ProfileCard />
-
-	{recentPosts.length > 0 && (
-		<section class="recent-section">
-			<div class="section-header">
-				<h2 class="section-title">Recent Posts</h2>
-				<a href="/blog" class="section-more">All posts →</a>
-			</div>
-			<BlogPostList posts={recentPosts} variant="home" />
-		</section>
-	)}
+	<ComingSoonPage />
 </BlogSectionLayout>
-
-<style>
-	.recent-section {
-		margin-top: 0;
-	}
-	.section-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 1rem;
-	}
-	.section-title {
-		font-size: 1.1em;
-		font-weight: 600;
-		color: var(--text-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		margin: 0;
-	}
-	.section-more {
-		font-size: 0.875em;
-		color: var(--accent);
-		text-decoration: none;
-		transition: opacity 0.2s ease;
-	}
-	.section-more:hover {
-		opacity: 0.8;
-		text-decoration: none;
-	}
-</style>

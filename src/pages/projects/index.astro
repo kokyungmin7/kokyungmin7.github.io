@@ -1,46 +1,13 @@
 ---
-import ProjectCard from '../../components/ProjectCard.astro';
+import ComingSoonPage from '../../components/ComingSoonPage.astro';
 import { SITE_TITLE } from '../../consts';
-import { getProjectDataset } from '../../data/projects';
 import SiteLayout from '../../layouts/SiteLayout.astro';
-
-const { projects } = await getProjectDataset();
 ---
 
 <SiteLayout title={`Projects — ${SITE_TITLE}`} description="고경민의 프로젝트 포트폴리오">
 	<div class="page-wrapper">
 		<main class="page-main">
-			<div class="page-header">
-				<h1>Projects</h1>
-				<p class="page-header-copy">직접 구현한 아이디어와 프로젝트 모음입니다.</p>
-			</div>
-
-			{projects.length === 0 ? (
-				<div class="empty-state">
-					<p>아직 등록된 프로젝트가 없습니다.</p>
-					<p class="empty-hint">
-						<code>src/content/projects/</code>에 마크다운 파일을 추가하면 여기에 표시됩니다.
-					</p>
-				</div>
-			) : (
-				<div class="project-grid">
-					{projects.map((project) => <ProjectCard project={project} />)}
-				</div>
-			)}
+			<ComingSoonPage />
 		</main>
 	</div>
 </SiteLayout>
-
-<style>
-	.project-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-		gap: 1.25rem;
-	}
-
-	@media (max-width: 900px) {
-		.project-grid {
-			grid-template-columns: 1fr;
-		}
-	}
-</style>
