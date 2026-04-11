@@ -1,0 +1,43 @@
+---
+import BlogPostList from '../../../../components/BlogPostList.astro';
+import { SITE_TITLE } from '../../../../consts';
+import { getBlogDataset, PREDEFINED_CATEGORIES, toSlug } from '../../../../data/blog';
+import BlogSectionLayout from '../../../../layouts/BlogSectionLayout.astro';
+
+export async function getStaticPaths() {
+	const { posts, searchEntries } = await getBlogDataset();
+
+	return PREDEFINED_CATEGORIES.flatMap(({ name: parentName, subcategories }) =>
+		subcategories.map((subName) => ({
+			params: {
+				parent: toSlug(parentName),
+				subcategory: toSlug(subName),
+			},
+			props: {
+				parentName,
+				subName,
+				filteredPosts: posts.filter(
+					(p) => p.data.category === parentName && p.data.subcategory === subName,
+				),
+				searchEntries,
+			},
+		})),
+	);
+}
+
+const { parentName, subName, filteredPosts, searchEntries } = Astro.props;
+---
+
+<BlogSectionLayout
+	title={`${subName} — ${SITE_TITLE}`}
+	description={`Posts in ${parentName} / ${subName}`}
+	searchEntries={searchEntries}
+	currentCategory={parentName}
+	currentSubcategory={subName}
+>
+	<div class="page-header page-header--inline">
+		<h1>{subName}</h1>
+		<p class="page-header-copy">{filteredPosts.length} posts</p>
+	</div>
+	<BlogPostList posts={filteredPosts} />
+</BlogSectionLayout>

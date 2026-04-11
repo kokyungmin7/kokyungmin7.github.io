@@ -4,15 +4,13 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 import { getBlogDataset } from '../../data/blog';
 import BlogSectionLayout from '../../layouts/BlogSectionLayout.astro';
 
-const { posts, recentPosts, searchEntries, categorySummaries } = await getBlogDataset();
+const { posts, searchEntries } = await getBlogDataset();
 ---
 
 <BlogSectionLayout
 	title={`Blog — ${SITE_TITLE}`}
 	description={SITE_DESCRIPTION}
 	searchEntries={searchEntries}
-	categorySummaries={categorySummaries}
-	recentPosts={recentPosts}
 >
 	<div class="page-header page-header--inline">
 		<h1>Blog</h1>
