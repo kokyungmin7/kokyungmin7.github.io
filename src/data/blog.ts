@@ -14,6 +14,12 @@ export interface BlogCategorySummary {
 	count: number;
 }
 
+export interface BlogCategoryTree {
+	name: string;
+	count: number;
+	subcategories: { name: string; count: number }[];
+}
+
 export interface BlogTagSummary {
 	name: string;
 	count: number;
@@ -24,10 +30,37 @@ export interface BlogDataset {
 	recentPosts: BlogPostEntry[];
 	searchEntries: BlogSearchEntry[];
 	categorySummaries: BlogCategorySummary[];
+	categoryTree: BlogCategoryTree[];
 	tagSummaries: BlogTagSummary[];
 }
 
 type BlogDatasetBase = Omit<BlogDataset, 'recentPosts'>;
+
+export function toSlug(name: string): string {
+	return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+export const PREDEFINED_CATEGORIES: { name: string; subcategories: string[] }[] = [
+	{ name: 'AI', subcategories: ['Computer Vision', 'Language Models', 'Machine Learning'] },
+	{ name: 'Math', subcategories: ['Linear Algebra', 'Probability & Statistics'] },
+	{ name: 'Engineering', subcategories: ['Optimization', 'System Design'] },
+];
+
+function buildCategoryTree(posts: BlogPostEntry[]): BlogCategoryTree[] {
+	return PREDEFINED_CATEGORIES.map(({ name, subcategories }) => {
+		const parentPosts = posts.filter((p) => p.data.category === name);
+		return {
+			name,
+			count: parentPosts.length,
+			subcategories: subcategories
+				.map((sub) => ({
+					name: sub,
+					count: parentPosts.filter((p) => p.data.subcategory === sub).length,
+				}))
+				.filter((sub) => sub.count > 0),
+		};
+	});
+}
 
 function sortBlogPosts(posts: BlogPostEntry[]): BlogPostEntry[] {
 	return [...posts].sort(
@@ -66,6 +99,7 @@ export async function getBlogDataset(recentPostLimit = 5): Promise<BlogDataset> 
 				{ name: '전체', count: posts.length },
 				...Array.from(categoryCounts.entries()).map(([name, count]) => ({ name, count })),
 			],
+			categoryTree: buildCategoryTree(posts),
 			tagSummaries: Array.from(tagCounts.entries())
 				.sort((firstTag, secondTag) => secondTag[1] - firstTag[1])
 				.map(([name, count]) => ({ name, count })),
