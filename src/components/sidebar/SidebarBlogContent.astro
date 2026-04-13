@@ -192,10 +192,10 @@ const { categoryTree, recentPosts, currentPath, currentCategory, currentSubcateg
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
-		color: rgba(255, 255, 255, 0.3);
+		color: var(--sidebar-muted);
 		margin: 0 0 0.5rem 0;
 		padding-bottom: 0.6rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+		border-bottom: 1px solid var(--sidebar-divider);
 	}
 
 	/* ── 공통 엔트리 텍스트 ── */
@@ -209,7 +209,7 @@ const { categoryTree, recentPosts, currentPath, currentCategory, currentSubcateg
 
 	.entry-count {
 		font-size: 0.8em;
-		color: rgba(255, 255, 255, 0.28);
+		color: var(--sidebar-muted);
 		margin-left: 0.3em;
 		flex-shrink: 0;
 	}
@@ -248,12 +248,12 @@ const { categoryTree, recentPosts, currentPath, currentCategory, currentSubcateg
 
 	.folder-icon {
 		flex-shrink: 0;
-		color: rgba(255, 255, 255, 0.35);
+		color: var(--sidebar-icon-muted);
 		transition: color 0.15s ease;
 	}
 
 	.category-header:hover .folder-icon {
-		color: rgba(255, 255, 255, 0.6);
+		color: var(--sidebar-icon-hover);
 	}
 
 	/* ── Chevron ── */
@@ -270,13 +270,13 @@ const { categoryTree, recentPosts, currentPath, currentCategory, currentSubcateg
 
 	.chevron-down {
 		position: absolute;
-		color: rgba(255, 255, 255, 0.3);
+		color: var(--sidebar-muted);
 		animation: keyframes-return 0.5s;
 		transition: color 0.15s ease;
 	}
 
 	.category-header:hover .chevron-down {
-		color: rgba(255, 255, 255, 0.6);
+		color: var(--sidebar-icon-hover);
 	}
 
 	.category-toggle:checked ~ .category-header .chevron-down {
@@ -328,18 +328,18 @@ const { categoryTree, recentPosts, currentPath, currentCategory, currentSubcateg
 
 	/* ── 다크 패널 위 sidebar-nav-item 색상 override ── */
 	:global(.sidebar-panel) :global(.sidebar-nav-item) {
-		color: rgba(255, 255, 255, 0.45);
+		color: var(--sidebar-nav-color);
 		border-radius: 0.35rem;
 	}
 
 	:global(.sidebar-panel) :global(.sidebar-nav-item:hover) {
-		color: rgba(255, 255, 255, 0.8);
-		background: rgba(255, 255, 255, 0.05);
+		color: var(--sidebar-nav-hover-color);
+		background: var(--sidebar-nav-hover-bg);
 	}
 
 	:global(.sidebar-panel) :global(.sidebar-nav-item.active) {
-		color: rgba(255, 255, 255, 0.9);
-		background: rgba(255, 255, 255, 0.07);
+		color: var(--sidebar-nav-active-color);
+		background: var(--sidebar-nav-active-bg);
 		border-left-color: var(--accent);
 	}
 
@@ -373,7 +373,7 @@ const { categoryTree, recentPosts, currentPath, currentCategory, currentSubcateg
 
 	.recent-date {
 		font-size: 0.78em;
-		color: rgba(255, 255, 255, 0.25);
+		color: var(--sidebar-muted);
 	}
 
 	/* ── 태그 링크 ── */
@@ -383,19 +383,19 @@ const { categoryTree, recentPosts, currentPath, currentCategory, currentSubcateg
 		padding: 0.55em 0.75em 0.6em;
 		border-radius: 0.5rem;
 		font-size: 0.82em;
-		color: rgba(255, 255, 255, 0.35);
+		color: var(--sidebar-nav-color);
 		text-decoration: none;
 		text-align: center;
-		border: 1px solid rgba(255, 255, 255, 0.08);
+		border: 1px solid var(--sidebar-divider);
 		transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 		white-space: nowrap;
 	}
 
 	.tags-link:hover,
 	.tags-link.active {
-		color: rgba(255, 255, 255, 0.7);
-		border-color: rgba(255, 255, 255, 0.2);
-		background: rgba(255, 255, 255, 0.05);
+		color: var(--sidebar-nav-hover-color);
+		border-color: var(--theme-toggle-ring);
+		background: var(--sidebar-nav-hover-bg);
 		text-decoration: none;
 	}
 </style>

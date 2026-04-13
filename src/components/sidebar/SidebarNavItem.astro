@@ -57,18 +57,18 @@ const { href, label, icon, active } = Astro.props;
 		gap: 0.6rem;
 		padding: 0.75rem 0.75rem;
 		text-decoration: none;
-		color: #a0a0a0;
+		color: var(--sidebar-nav-color);
 		transition: color 0.2s ease, background 0.2s ease;
 	}
 
 	.site-nav-item:hover {
-		color: #e8e8e8;
-		background: rgba(255, 255, 255, 0.03);
+		color: var(--sidebar-nav-hover-color);
+		background: var(--sidebar-nav-hover-bg);
 		text-decoration: none;
 	}
 
 	.site-nav-item.active {
-		color: #ebebeb;
+		color: var(--sidebar-nav-active-color);
 	}
 
 	/* ── 아이콘 컨테이너 — 항상 40×40 고정 ── */
@@ -129,11 +129,11 @@ const { href, label, icon, active } = Astro.props;
 	}
 
 	:global(html.sidebar-collapsed) .site-nav-item:hover .nav-icon {
-		background: rgba(255, 255, 255, 0.07);
+		background: var(--sidebar-nav-hover-bg);
 	}
 
 	:global(html.sidebar-collapsed) .site-nav-item.active .nav-icon {
-		background: rgba(255, 255, 255, 0.13);
+		background: var(--sidebar-nav-active-bg);
 	}
 
 	:global(html.sidebar-collapsed) .nav-label {
