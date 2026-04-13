@@ -5,13 +5,15 @@ import ShinyText from './ShinyText';
 <section class="coming-soon" aria-label="Coming Soon">
 	<div class="coming-soon__text">
 		<h1 class="coming-soon__heading">
-			<ShinyText text="Coming Soon" speed={2} color="#b5b5b5" shineColor="#ffffff" client:load />
+			<ShinyText text="Coming Soon" speed={2} color="var(--coming-soon-text)" shineColor="var(--coming-soon-shine)" client:load />
 		</h1>
 	</div>
 </section>
 
 <style>
 	.coming-soon {
+		--coming-soon-text: #b5b5b5;
+		--coming-soon-shine: #ffffff;
 		display: grid;
 		place-items: center;
 		min-height: calc(100vh - 5rem);

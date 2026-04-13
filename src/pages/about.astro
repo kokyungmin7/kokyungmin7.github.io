@@ -1,13 +1,9 @@
 ---
 import ComingSoonPage from '../components/ComingSoonPage.astro';
 import { SITE_TITLE } from '../consts';
-import SiteLayout from '../layouts/SiteLayout.astro';
+import StandardPageLayout from '../layouts/StandardPageLayout.astro';
 ---
 
-<SiteLayout title={`About — ${SITE_TITLE}`} description="고경민 소개 페이지">
-	<div class="page-wrapper">
-		<main class="page-main">
-			<ComingSoonPage />
-		</main>
-	</div>
-</SiteLayout>
+<StandardPageLayout title={`About — ${SITE_TITLE}`} description="고경민 소개 페이지">
+	<ComingSoonPage />
+</StandardPageLayout>

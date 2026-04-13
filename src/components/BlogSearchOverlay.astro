@@ -25,7 +25,7 @@ const { searchEntries } = Astro.props;
 		</div>
 		<ul class="search-results" id="search-results" role="listbox"></ul>
 		<p class="search-message" id="search-hint">검색어를 입력하세요</p>
-		<p class="search-message" id="search-empty" style="display:none">결과가 없습니다</p>
+		<p class="search-message" id="search-empty" hidden>결과가 없습니다</p>
 	</div>
 </div>
 
@@ -51,9 +51,9 @@ const { searchEntries } = Astro.props;
 		overlay.style.display = 'flex';
 		overlay.setAttribute('aria-hidden', 'false');
 		input.value = '';
-		results.innerHTML = '';
-		hint.style.display = 'block';
-		empty.style.display = 'none';
+		results.replaceChildren();
+		hint.hidden = false;
+		empty.hidden = true;
 		requestAnimationFrame(() => input.focus());
 	}
 
@@ -64,36 +64,55 @@ const { searchEntries } = Astro.props;
 		overlay.setAttribute('aria-hidden', 'true');
 	}
 
-	function highlightMatchedText(text, query) {
-		if (!query) return text;
+	function appendHighlightedText(element, text, query) {
+		if (!query) {
+			element.textContent = text;
+			return;
+		}
 
 		const matchedIndex = text.toLowerCase().indexOf(query.toLowerCase());
-		if (matchedIndex === -1) return text;
+		if (matchedIndex === -1) {
+			element.textContent = text;
+			return;
+		}
 
-		return (
-			text.slice(0, matchedIndex) +
-			'<mark>' +
-			text.slice(matchedIndex, matchedIndex + query.length) +
-			'</mark>' +
-			text.slice(matchedIndex + query.length)
+		element.append(
+			document.createTextNode(text.slice(0, matchedIndex)),
+			Object.assign(document.createElement('mark'), {
+				textContent: text.slice(matchedIndex, matchedIndex + query.length),
+			}),
+			document.createTextNode(text.slice(matchedIndex + query.length)),
 		);
 	}
 
 	function renderResults(filteredEntries, query) {
 		if (!results) return;
 
-		results.innerHTML = '';
+		results.replaceChildren();
 		filteredEntries.forEach((post) => {
 			const listItem = document.createElement('li');
 			listItem.setAttribute('role', 'option');
 
 			const link = document.createElement('a');
-			link.href = `/blog/${post.id}/`;
-			link.innerHTML = `
-				<span class="result-title">${highlightMatchedText(post.title, query)}</span>
-				${post.description ? `<span class="result-desc">${highlightMatchedText(post.description, query)}</span>` : ''}
-				${post.category ? `<span class="result-cat">${post.category}</span>` : ''}
-			`;
+			link.href = post.url;
+			const title = document.createElement('span');
+			title.className = 'result-title';
+			appendHighlightedText(title, post.title, query);
+			link.append(title);
+
+			if (post.description) {
+				const description = document.createElement('span');
+				description.className = 'result-desc';
+				appendHighlightedText(description, post.description, query);
+				link.append(description);
+			}
+
+			if (post.category) {
+				const category = document.createElement('span');
+				category.className = 'result-cat';
+				category.textContent = post.category;
+				link.append(category);
+			}
 			link.addEventListener('click', closeSearch);
 
 			listItem.appendChild(link);
@@ -120,15 +139,15 @@ const { searchEntries } = Astro.props;
 		if (!results || !hint || !empty || !input) return;
 
 		const query = input.value.trim();
-		results.innerHTML = '';
+		results.replaceChildren();
 
 		if (!query) {
-			hint.style.display = 'block';
-			empty.style.display = 'none';
+			hint.hidden = false;
+			empty.hidden = true;
 			return;
 		}
 
-		hint.style.display = 'none';
+		hint.hidden = true;
 
 		const normalizedQuery = query.toLowerCase();
 		const filteredEntries = searchEntries.filter(
@@ -139,11 +158,11 @@ const { searchEntries } = Astro.props;
 		);
 
 		if (filteredEntries.length === 0) {
-			empty.style.display = 'block';
+			empty.hidden = false;
 			return;
 		}
 
-		empty.style.display = 'none';
+		empty.hidden = true;
 		renderResults(filteredEntries, query);
 	});
 </script>
@@ -274,5 +293,9 @@ const { searchEntries } = Astro.props;
 		color: var(--text-muted);
 		font-size: 0.88em;
 		border-top: 1px solid var(--border);
+	}
+
+	.search-message[hidden] {
+		display: none;
 	}
 </style>

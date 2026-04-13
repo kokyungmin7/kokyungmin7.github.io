@@ -1,5 +1,6 @@
 ---
 import BlogPostList from '../../components/BlogPostList.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 import { getBlogDataset } from '../../data/blog';
 import BlogSectionLayout from '../../layouts/BlogSectionLayout.astro';
@@ -12,9 +13,6 @@ const { posts, searchEntries } = await getBlogDataset();
 	description={SITE_DESCRIPTION}
 	searchEntries={searchEntries}
 >
-	<div class="page-header page-header--inline">
-		<h1>Blog</h1>
-		<p class="page-header-copy">{posts.length}개의 포스트</p>
-	</div>
+	<PageHeader title="Blog" description={`${posts.length}개의 포스트`} />
 	<BlogPostList posts={posts} />
 </BlogSectionLayout>

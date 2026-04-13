@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import FormattedDate from './FormattedDate.astro';
-import type { BlogPostEntry } from '../data/blog';
+import { getBlogPostPath, type BlogPostEntry } from '../data/blog';
 
 interface Props {
 	posts: BlogPostEntry[];
@@ -16,7 +16,7 @@ const isHomeVariant = variant === 'home';
 	<ul class="post-list--home">
 		{posts.map((post) => (
 			<li>
-				<a href={`/blog/${post.id}/`} class="post-card--home">
+				<a href={getBlogPostPath(post.id)} class="post-card--home">
 					<div class="post-meta--leading">
 						<span class="post-date">
 							<FormattedDate date={post.data.pubDate} />
@@ -34,7 +34,7 @@ const isHomeVariant = variant === 'home';
 	<ul class="post-list">
 		{posts.map((post, index) => (
 			<li class="post-item">
-				<a href={`/blog/${post.id}/`} class="post-row">
+				<a href={getBlogPostPath(post.id)} class="post-row">
 					<span class="post-num">
 						{String(index + 1).padStart(2, '0')}<span class="post-dot">.</span>
 					</span>

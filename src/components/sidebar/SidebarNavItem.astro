@@ -1,8 +1,11 @@
 ---
+import SiteNavIcon from '../icons/SiteNavIcon.astro';
+import type { SiteNavIcon as SiteNavIconName } from '../../data/navigation';
+
 interface Props {
 	href: string;
 	label: string;
-	icon: string;
+	icon: SiteNavIconName;
 	active: boolean;
 }
 
@@ -10,7 +13,9 @@ const { href, label, icon, active } = Astro.props;
 ---
 
 <a href={href} class:list={['site-nav-item', { active }]}>
-	<span class="nav-icon" set:html={icon} />
+	<span class="nav-icon">
+		<SiteNavIcon name={icon} />
+	</span>
 	<span class="nav-label">{label}</span>
 	{active && <span class="active-dot" aria-hidden="true"></span>}
 </a>

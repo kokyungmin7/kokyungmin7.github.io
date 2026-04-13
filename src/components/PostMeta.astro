@@ -1,0 +1,45 @@
+---
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+	pubDate: Date;
+	category?: string;
+	updatedDate?: Date;
+}
+
+const { pubDate, category, updatedDate } = Astro.props;
+---
+
+<div class="post-meta-row">
+	<FormattedDate date={pubDate} />
+	{category && <span class="post-category">{category}</span>}
+	{updatedDate && (
+		<span class="updated-on">
+			수정: <FormattedDate date={updatedDate} />
+		</span>
+	)}
+</div>
+
+<style>
+	.post-meta-row {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.5em;
+		font-size: 0.875em;
+		color: var(--text-muted);
+		margin-bottom: 0.75rem;
+	}
+
+	.post-category {
+		background: var(--accent-dim);
+		color: var(--accent);
+		border-radius: 4px;
+		padding: 0.1em 0.5em;
+		font-size: 0.9em;
+	}
+
+	.updated-on {
+		font-style: italic;
+	}
+</style>
