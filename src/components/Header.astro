@@ -239,10 +239,8 @@ import HeaderLink from './HeaderLink.astro';
 <script>
 	const btn = document.getElementById('theme-toggle');
 	btn?.addEventListener('click', () => {
-		const current = document.documentElement.getAttribute('data-theme');
-		const next = current === 'dark' ? 'light' : 'dark';
-		document.documentElement.setAttribute('data-theme', next);
-		localStorage.setItem('theme', next);
+		const siteTheme = (window as Window & { siteTheme?: { toggle: () => 'dark' | 'light' } }).siteTheme;
+		siteTheme?.toggle();
 	});
 
 	const shell = document.getElementById('header-shell');
