@@ -41,7 +41,7 @@ export function toSlug(name: string): string {
 }
 
 export const PREDEFINED_CATEGORIES: { name: string; subcategories: string[] }[] = [
-	{ name: 'AI', subcategories: ['Computer Vision', 'Language Models', 'Machine Learning'] },
+	{ name: 'AI', subcategories: ['Computer Vision', 'Deep Learning', 'Language Models', 'Machine Learning'] },
 	{ name: 'Math', subcategories: ['Linear Algebra', 'Probability & Statistics'] },
 	{ name: 'Engineering', subcategories: ['Optimization', 'System Design'] },
 ];
@@ -52,12 +52,10 @@ function buildCategoryTree(posts: BlogPostEntry[]): BlogCategoryTree[] {
 		return {
 			name,
 			count: parentPosts.length,
-			subcategories: subcategories
-				.map((sub) => ({
+			subcategories: subcategories.map((sub) => ({
 					name: sub,
 					count: parentPosts.filter((p) => p.data.subcategory === sub).length,
-				}))
-				.filter((sub) => sub.count > 0),
+				})),
 		};
 	});
 }
