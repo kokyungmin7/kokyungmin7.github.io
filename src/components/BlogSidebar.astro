@@ -3,6 +3,7 @@ import type { BlogCategoryTree, BlogPostEntry } from '../data/blog';
 import SidebarToggle from './sidebar/SidebarToggle.astro';
 import SidebarNavItem from './sidebar/SidebarNavItem.astro';
 import SidebarBlogContent from './sidebar/SidebarBlogContent.astro';
+import ThemeToggle from './sidebar/ThemeToggle.astro';
 
 interface Props {
 	currentCategory?: string;
@@ -54,6 +55,8 @@ const siteNav = [
 				</>
 			))}
 		</nav>
+		<ThemeToggle />
+		<div class="panel-divider"></div>
 
 		<SidebarBlogContent
 			categoryTree={categoryTree}
@@ -164,11 +167,11 @@ const siteNav = [
 		height: 100vh;
 		overflow-y: auto;
 		overflow-x: hidden;
-		background: #181818;
+		background: var(--sidebar-bg);
 		border-radius: 0;
-		transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
 		scrollbar-width: thin;
-		scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+		scrollbar-color: var(--sidebar-divider) transparent;
 	}
 
 	.sidebar-container.collapsed .sidebar-panel,
@@ -179,7 +182,7 @@ const siteNav = [
 	/* ── 구분선 ── */
 	.panel-divider {
 		height: 1px;
-		background: rgba(255, 255, 255, 0.07);
+		background: var(--sidebar-divider);
 		margin: 0;
 		border: none;
 	}

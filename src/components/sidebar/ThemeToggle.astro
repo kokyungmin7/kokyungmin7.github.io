@@ -1,0 +1,154 @@
+---
+---
+
+<div class="theme-toggle-row">
+	<label class="toggle" aria-label="다크 모드와 라이트 모드 전환">
+		<input class="input" type="checkbox" data-theme-switch />
+		<svg class="icon icon--moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path>
+		</svg>
+		<svg class="icon icon--sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+			<circle cx="12" cy="12" r="4.6"></circle>
+			<path d="M12 2.2v2"></path>
+			<path d="M12 19.8v2"></path>
+			<path d="m4.8 4.8 1.4 1.4"></path>
+			<path d="m17.8 17.8 1.4 1.4"></path>
+			<path d="M2.2 12h2"></path>
+			<path d="M19.8 12h2"></path>
+			<path d="m4.8 19.2 1.4-1.4"></path>
+			<path d="m17.8 6.2 1.4-1.4"></path>
+		</svg>
+	</label>
+	<span class="theme-toggle-label nav-label">THEME</span>
+</div>
+
+<script>
+	type SiteTheme = 'dark' | 'light';
+	type SiteThemeController = {
+		get: () => SiteTheme;
+		set: (theme: SiteTheme) => SiteTheme;
+		toggle: () => SiteTheme;
+	};
+
+	const themeSwitches = document.querySelectorAll<HTMLInputElement>('[data-theme-switch]');
+	const siteTheme = (window as Window & { siteTheme?: SiteThemeController }).siteTheme;
+
+	function syncThemeSwitches(theme = siteTheme?.get() ?? 'dark') {
+		themeSwitches.forEach((themeSwitch) => {
+			themeSwitch.checked = theme === 'light';
+			themeSwitch.setAttribute('aria-checked', String(themeSwitch.checked));
+		});
+	}
+
+	syncThemeSwitches();
+
+	themeSwitches.forEach((themeSwitch) => {
+		if (themeSwitch.dataset.bound === 'true') return;
+		themeSwitch.dataset.bound = 'true';
+		themeSwitch.addEventListener('change', () => {
+			syncThemeSwitches(siteTheme?.set(themeSwitch.checked ? 'light' : 'dark') ?? 'dark');
+		});
+	});
+
+	window.addEventListener('site-theme-change', (event) => {
+		const theme = (event as CustomEvent<{ theme: SiteTheme }>).detail.theme;
+		syncThemeSwitches(theme);
+	});
+</script>
+
+<style>
+	.theme-toggle-row {
+		display: grid;
+		grid-template-columns: 64px minmax(0, 1fr);
+		align-items: center;
+		min-height: 64px;
+		padding: 0;
+		color: var(--theme-toggle-text);
+		transition: color 0.2s ease;
+	}
+
+	.theme-toggle-row:hover {
+		color: var(--sidebar-nav-hover-color);
+	}
+
+	/* From Uiverse.io by santosh-sarkar, adapted for the sidebar theme tokens */
+	.toggle {
+		width: 56px;
+		height: 56px;
+		border-radius: 50%;
+		display: grid;
+		place-items: center;
+		justify-self: center;
+		cursor: pointer;
+		line-height: 1;
+		flex-shrink: 0;
+		background: transparent;
+		border: 0;
+		transition: transform 0.2s ease;
+	}
+
+	.toggle:hover {
+		transform: translateY(-1px);
+	}
+
+	.input {
+		display: none;
+	}
+
+	.icon {
+		grid-column: 1 / 1;
+		grid-row: 1 / 1;
+		transition: transform 500ms;
+		line-height: 0.1;
+	}
+
+	.icon--moon {
+		transition-delay: 200ms;
+		color: #b4b4b4;
+	}
+
+	.icon--sun {
+		transform: scale(0);
+		color: #ffa500;
+	}
+
+	.input:checked + .icon--moon {
+		transform: rotate(360deg) scale(0);
+	}
+
+	.input:checked ~ .icon--sun {
+		transition-delay: 200ms;
+		transform: scale(1) rotate(360deg);
+	}
+
+	.theme-toggle-label {
+		grid-column: 2;
+		font-size: 0.82rem;
+		font-weight: 800;
+		letter-spacing: 0.03em;
+		white-space: nowrap;
+		overflow: hidden;
+		max-width: 160px;
+		transition: max-width 0s, opacity 0.1s ease;
+	}
+
+	:global(html.sidebar-collapsed) .theme-toggle-row {
+		grid-template-columns: 64px 0;
+	}
+
+	:global(html.sidebar-collapsed) .theme-toggle-label {
+		max-width: 0;
+		opacity: 0;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.toggle,
+		.icon {
+			transition: none;
+		}
+
+		.toggle:hover {
+			transform: none;
+		}
+	}
+</style>
