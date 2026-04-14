@@ -1,5 +1,6 @@
 ---
 import { SITE_TITLE } from '../consts';
+import { SITE_NAV_ITEMS } from '../data/navigation';
 import HeaderLink from './HeaderLink.astro';
 ---
 
@@ -9,10 +10,9 @@ import HeaderLink from './HeaderLink.astro';
 			<a href="/" class="brand">{SITE_TITLE}</a>
 			<nav class="nav-center" aria-label="Main navigation">
 				<div class="nav-pill glass-panel">
-					<HeaderLink href="/" class="nav-pill-link">Home</HeaderLink>
-					<HeaderLink href="/blog" class="nav-pill-link">Blog</HeaderLink>
-					<HeaderLink href="/projects" class="nav-pill-link">Projects</HeaderLink>
-					<HeaderLink href="/about" class="nav-pill-link">About</HeaderLink>
+					{SITE_NAV_ITEMS.map((item) => (
+						<HeaderLink href={item.href} class="nav-pill-link">{item.label}</HeaderLink>
+					))}
 				</div>
 			</nav>
 			<div class="header-actions">

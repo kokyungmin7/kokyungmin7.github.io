@@ -1,7 +1,11 @@
 ---
 import FormattedDate from '../FormattedDate.astro';
-import type { BlogCategoryTree, BlogPostEntry } from '../../data/blog';
-import { toSlug } from '../../data/blog';
+import {
+	getBlogCategoryPath,
+	getBlogPostPath,
+	type BlogCategoryTree,
+	type BlogPostEntry,
+} from '../../data/blog';
 
 interface Props {
 	categoryTree: BlogCategoryTree[];
@@ -46,7 +50,7 @@ const { categoryTree, recentPosts, currentPath, currentCategory, currentSubcateg
 						{parent.subcategories.map((sub) => (
 							<li>
 								<a
-									href={`/blog/category/${toSlug(parent.name)}/${toSlug(sub.name)}/`}
+									href={getBlogCategoryPath(parent.name, sub.name)}
 									class:list={[
 										'sidebar-nav-item',
 										'subcategory-link',
@@ -70,8 +74,8 @@ const { categoryTree, recentPosts, currentPath, currentCategory, currentSubcateg
 			{recentPosts.map((post) => (
 				<li>
 					<a
-						href={`/blog/${post.id}/`}
-						class:list={['sidebar-nav-item', 'recent-link', { active: currentPath === `/blog/${post.id}/` }]}
+						href={getBlogPostPath(post.id)}
+						class:list={['sidebar-nav-item', 'recent-link', { active: currentPath === getBlogPostPath(post.id) }]}
 					>
 						<span class="recent-title">{post.data.title}</span>
 						<span class="recent-date"><FormattedDate date={post.data.pubDate} /></span>

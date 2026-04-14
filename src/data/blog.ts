@@ -7,6 +7,7 @@ export interface BlogSearchEntry {
 	title: string;
 	description: string;
 	category: string;
+	url: string;
 }
 
 export interface BlogCategorySummary {
@@ -38,6 +39,14 @@ type BlogDatasetBase = Omit<BlogDataset, 'recentPosts'>;
 
 export function toSlug(name: string): string {
 	return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+export function getBlogPostPath(postId: string): string {
+	return `/blog/${postId}/`;
+}
+
+export function getBlogCategoryPath(parentName: string, subcategoryName: string): string {
+	return `/blog/category/${toSlug(parentName)}/${toSlug(subcategoryName)}/`;
 }
 
 export const PREDEFINED_CATEGORIES: { name: string; subcategories: string[] }[] = [
@@ -79,6 +88,7 @@ export async function getBlogDataset(recentPostLimit = 5): Promise<BlogDataset> 
 			title: post.data.title,
 			description: post.data.description,
 			category: post.data.category ?? '',
+			url: getBlogPostPath(post.id),
 		}));
 		const categoryCounts = new Map<string, number>();
 		const tagCounts = new Map<string, number>();
