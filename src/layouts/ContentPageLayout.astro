@@ -82,10 +82,18 @@ const { title, description, heroImage, eyebrow, mainClass } = Astro.props;
 		margin: 0.75rem 0 0 0;
 	}
 
-	.prose-content :global(h2),
 	.prose-content :global(h3),
 	.prose-content :global(h4) {
 		scroll-margin-top: var(--header-height);
+	}
+
+	.prose-content :global(h2) {
+		scroll-margin-top: var(--header-height);
+		margin-top: 4rem;
+	}
+
+	.prose-content :global(h2:first-child) {
+		margin-top: 0;
 	}
 
 	@media (max-width: 720px) {

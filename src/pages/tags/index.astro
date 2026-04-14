@@ -1,4 +1,6 @@
 ---
+import PageHeader from '../../components/PageHeader.astro';
+import TagCloud from '../../components/TagCloud.astro';
 import { SITE_TITLE } from '../../consts';
 import { getBlogDataset } from '../../data/blog';
 import BlogSectionLayout from '../../layouts/BlogSectionLayout.astro';
@@ -11,10 +13,7 @@ const { tagSummaries, searchEntries } = await getBlogDataset();
 	description="모든 태그 보기"
 	searchEntries={searchEntries}
 >
-	<div class="page-header page-header--inline">
-		<h1>Tags</h1>
-		<p class="page-header-copy">{tagSummaries.length}개의 태그</p>
-	</div>
+	<PageHeader title="Tags" description={`${tagSummaries.length}개의 태그`} />
 
 	{tagSummaries.length === 0 ? (
 		<div class="empty-state">
@@ -24,50 +23,6 @@ const { tagSummaries, searchEntries } = await getBlogDataset();
 			</p>
 		</div>
 	) : (
-		<div class="tags-cloud">
-			{tagSummaries.map((tag) => (
-				<span class="tag-chip">
-					<span class="tag-name">#{tag.name}</span>
-					<span class="tag-count">{tag.count}</span>
-				</span>
-			))}
-		</div>
+		<TagCloud tags={tagSummaries} />
 	)}
 </BlogSectionLayout>
-
-<style>
-	/* Tags cloud */
-	.tags-cloud {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.6rem;
-	}
-
-	.tag-chip {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4em;
-		background: var(--bg-card);
-		border: 1px solid var(--border);
-		border-radius: 20px;
-		padding: 0.35em 0.8em 0.35em 0.9em;
-		cursor: default;
-		transition: border-color 0.15s ease, background-color 0.15s ease;
-	}
-	.tag-chip:hover {
-		border-color: var(--accent);
-		background-color: var(--accent-dim);
-	}
-	.tag-name {
-		font-size: 0.9em;
-		color: var(--text);
-	}
-	.tag-count {
-		font-size: 0.75em;
-		background: var(--border);
-		color: var(--text-muted);
-		border-radius: 10px;
-		padding: 0.05em 0.5em;
-		line-height: 1.6;
-	}
-</style>

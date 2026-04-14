@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
-import FormattedDate from '../components/FormattedDate.astro';
+import PostMeta from '../components/PostMeta.astro';
 import { getBlogDataset } from '../data/blog';
 import BlogSectionLayout from './BlogSectionLayout.astro';
 
@@ -24,15 +24,7 @@ const { searchEntries } = await getBlogDataset();
 			</div>
 		)}
 		<div class="post-header">
-			<div class="post-meta-row">
-				<FormattedDate date={pubDate} />
-				{category && <span class="post-category">{category}</span>}
-				{updatedDate && (
-					<span class="updated-on">
-						수정: <FormattedDate date={updatedDate} />
-					</span>
-				)}
-			</div>
+			<PostMeta pubDate={pubDate} category={category} updatedDate={updatedDate} />
 			<h1>{title}</h1>
 			{description && <p class="post-description">{description}</p>}
 			<hr />
@@ -122,28 +114,6 @@ const { searchEntries } = await getBlogDataset();
 		margin-bottom: 2rem;
 	}
 
-	.post-meta-row {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 0.5em;
-		font-size: 0.875em;
-		color: var(--text-muted);
-		margin-bottom: 0.75rem;
-	}
-
-	.post-category {
-		background: var(--accent-dim);
-		color: var(--accent);
-		border-radius: 4px;
-		padding: 0.1em 0.5em;
-		font-size: 0.9em;
-	}
-
-	.updated-on {
-		font-style: italic;
-	}
-
 	h1 {
 		font-size: 2em;
 		font-weight: 700;
@@ -164,10 +134,18 @@ const { searchEntries } = await getBlogDataset();
 		margin: 1.25rem 0 2rem 0;
 	}
 
-	.prose-content :global(h2),
 	.prose-content :global(h3),
 	.prose-content :global(h4) {
 		scroll-margin-top: var(--header-height);
+	}
+
+	.prose-content :global(h2) {
+		scroll-margin-top: var(--header-height);
+		margin-top: 4rem;
+	}
+
+	.prose-content :global(h2:first-child) {
+		margin-top: 0;
 	}
 
 	/* ── Responsive ─────────────────────── */

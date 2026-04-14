@@ -1,5 +1,6 @@
 ---
 import BlogPostList from '../../../../components/BlogPostList.astro';
+import PageHeader from '../../../../components/PageHeader.astro';
 import { SITE_TITLE } from '../../../../consts';
 import { getBlogDataset, PREDEFINED_CATEGORIES, toSlug } from '../../../../data/blog';
 import BlogSectionLayout from '../../../../layouts/BlogSectionLayout.astro';
@@ -35,9 +36,6 @@ const { parentName, subName, filteredPosts, searchEntries } = Astro.props;
 	currentCategory={parentName}
 	currentSubcategory={subName}
 >
-	<div class="page-header page-header--inline">
-		<h1>{subName}</h1>
-		<p class="page-header-copy">{filteredPosts.length} posts</p>
-	</div>
+	<PageHeader title={subName} description={`${filteredPosts.length} posts`} />
 	<BlogPostList posts={filteredPosts} />
 </BlogSectionLayout>

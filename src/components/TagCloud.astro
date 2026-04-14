@@ -1,0 +1,54 @@
+---
+import type { BlogTagSummary } from '../data/blog';
+
+interface Props {
+	tags: BlogTagSummary[];
+}
+
+const { tags } = Astro.props;
+---
+
+<div class="tags-cloud">
+	{tags.map((tag) => (
+		<span class="tag-chip">
+			<span class="tag-name">#{tag.name}</span>
+			<span class="tag-count">{tag.count}</span>
+		</span>
+	))}
+</div>
+
+<style>
+	.tags-cloud {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+	}
+
+	.tag-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4em;
+		background: var(--bg-card);
+		border: 1px solid var(--border);
+		border-radius: 20px;
+		padding: 0.35em 0.8em 0.35em 0.9em;
+		cursor: default;
+		transition: border-color 0.15s ease, background-color 0.15s ease;
+	}
+	.tag-chip:hover {
+		border-color: var(--accent);
+		background-color: var(--accent-dim);
+	}
+	.tag-name {
+		font-size: 0.9em;
+		color: var(--text);
+	}
+	.tag-count {
+		font-size: 0.75em;
+		background: var(--border);
+		color: var(--text-muted);
+		border-radius: 10px;
+		padding: 0.05em 0.5em;
+		line-height: 1.6;
+	}
+</style>

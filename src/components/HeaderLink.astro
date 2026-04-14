@@ -1,12 +1,13 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
+import { isActivePath, SITE_NAV_ITEMS } from '../data/navigation';
 
 type Props = HTMLAttributes<'a'>;
 
 const { href, class: className, ...props } = Astro.props;
 const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, '');
-const subpath = pathname.match(/[^\/]+/g);
-const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
+const navItem = SITE_NAV_ITEMS.find((item) => item.href === href);
+const isActive = navItem ? isActivePath(pathname, navItem) : href === pathname;
 ---
 
 <a href={href} class:list={[className, { active: isActive }]} {...props}>
