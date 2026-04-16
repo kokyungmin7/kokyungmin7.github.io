@@ -234,18 +234,18 @@ export default function LSTMViz() {
       ctx.fillText(TOKENS[t].word, cx, yToken)
     }
 
-    // Row labels (right side)
+    // Row labels (left margin)
     const rowLabels = [
-      { y: yCell, text: '셀 상태 c', color: C.cell },
-      { y: yBars, text: '게이트',    color: C.muted },
-      { y: yHid,  text: '히든 상태 h', color: C.hid },
+      { y: yCell, text: 'c', color: C.cell },
+      { y: yBars, text: 'gate', color: C.muted },
+      { y: yHid,  text: 'h', color: C.hid },
     ]
     rowLabels.forEach(({ y, text, color }) => {
       ctx.fillStyle = color
-      ctx.font = '10px sans-serif'
-      ctx.textAlign = 'left'
+      ctx.font = `bold 10px monospace`
+      ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.fillText(text, W - PAD * 0.5 - ctx.measureText(text).width - 2, y)
+      ctx.fillText(text, PAD / 2, y)
     })
   }, [step])
 
@@ -263,6 +263,9 @@ export default function LSTMViz() {
 
   const s   = STATES[step]
   const tok = TOKENS[step]
+
+  // Format a weight+bias term cleanly: "+ -0.8" → "- 0.8"
+  const fmtBias = (b) => b >= 0 ? `+ ${b}` : `- ${Math.abs(b)}`
 
   const btnStyle = (active) => ({
     fontSize: '12px', padding: '5px 12px', borderRadius: '6px',
@@ -336,7 +339,7 @@ export default function LSTMViz() {
         {[
           { key: 'f', val: s.f, pct: s.f,            color: GC.f, label: 'f  잊기', desc: '이전 셀 상태를 얼마나 유지할까? (1 = 전부 유지, 0 = 전부 삭제)' },
           { key: 'i', val: s.i, pct: s.i,            color: GC.i, label: 'i  입력', desc: '새 정보를 얼마나 받아들일까?' },
-          { key: 'g', val: s.g, pct: (s.g + 1) / 2, color: GC.g, label: 'g  후보', desc: '새롭게 기록할 내용 — tanh 출력이라 −1 ~ 1 범위' },
+          { key: 'g', val: s.g, pct: (s.g + 1) / 2, color: GC.g, label: 'g  후보', desc: '새롭게 기록할 내용 — tanh 출력 (−1 ~ 1). 막대는 시각화를 위해 (g+1)/2 로 정규화' },
           { key: 'o', val: s.o, pct: s.o,            color: GC.o, label: 'o  출력', desc: '셀 상태에서 얼마나 꺼내 h 로 내보낼까?' },
         ].map(({ key, val, pct, color, label, desc }) => (
           <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
@@ -361,22 +364,22 @@ export default function LSTMViz() {
         </div>
         <div>
           <span style={{ color: GC.f }}>f{step}</span>
-          {` = σ(${Wf.x}×${s.x.toFixed(2)} + ${Wf.h}×${s.h_prev.toFixed(4)} + ${Wf.b}) = σ(${(Wf.x*s.x + Wf.h*s.h_prev + Wf.b).toFixed(4)}) = `}
+          {` = σ(${Wf.x}×${s.x.toFixed(2)} + ${Wf.h}×${s.h_prev.toFixed(4)} ${fmtBias(Wf.b)}) = σ(${(Wf.x*s.x + Wf.h*s.h_prev + Wf.b).toFixed(4)}) = `}
           <strong style={{ color: GC.f }}>{s.f.toFixed(4)}</strong>
         </div>
         <div>
           <span style={{ color: GC.i }}>i{step}</span>
-          {` = σ(${Wi.x}×${s.x.toFixed(2)} + ${Wi.h}×${s.h_prev.toFixed(4)} + ${Wi.b}) = σ(${(Wi.x*s.x + Wi.h*s.h_prev + Wi.b).toFixed(4)}) = `}
+          {` = σ(${Wi.x}×${s.x.toFixed(2)} + ${Wi.h}×${s.h_prev.toFixed(4)} ${fmtBias(Wi.b)}) = σ(${(Wi.x*s.x + Wi.h*s.h_prev + Wi.b).toFixed(4)}) = `}
           <strong style={{ color: GC.i }}>{s.i.toFixed(4)}</strong>
         </div>
         <div>
           <span style={{ color: GC.g }}>g{step}</span>
-          {` = tanh(${Wg.x}×${s.x.toFixed(2)} + ${Wg.h}×${s.h_prev.toFixed(4)} + ${Wg.b}) = tanh(${(Wg.x*s.x + Wg.h*s.h_prev + Wg.b).toFixed(4)}) = `}
+          {` = tanh(${Wg.x}×${s.x.toFixed(2)} + ${Wg.h}×${s.h_prev.toFixed(4)} ${fmtBias(Wg.b)}) = tanh(${(Wg.x*s.x + Wg.h*s.h_prev + Wg.b).toFixed(4)}) = `}
           <strong style={{ color: GC.g }}>{s.g.toFixed(4)}</strong>
         </div>
         <div>
           <span style={{ color: GC.o }}>o{step}</span>
-          {` = σ(${Wo.x}×${s.x.toFixed(2)} + ${Wo.h}×${s.h_prev.toFixed(4)} + ${Wo.b}) = σ(${(Wo.x*s.x + Wo.h*s.h_prev + Wo.b).toFixed(4)}) = `}
+          {` = σ(${Wo.x}×${s.x.toFixed(2)} + ${Wo.h}×${s.h_prev.toFixed(4)} ${fmtBias(Wo.b)}) = σ(${(Wo.x*s.x + Wo.h*s.h_prev + Wo.b).toFixed(4)}) = `}
           <strong style={{ color: GC.o }}>{s.o.toFixed(4)}</strong>
         </div>
         <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid var(--border)' }}>
