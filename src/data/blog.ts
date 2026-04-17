@@ -50,8 +50,9 @@ export function getBlogCategoryPath(parentName: string, subcategoryName: string)
 }
 
 export const PREDEFINED_CATEGORIES: { name: string; subcategories: string[] }[] = [
-	{ name: 'AI', subcategories: ['Computer Vision', 'Deep Learning', 'Language Models', 'Machine Learning'] },
-	{ name: 'Math', subcategories: ['Linear Algebra', 'Probability & Statistics'] },
+	{ name: 'AI', subcategories: ['Computer Vision', 'Language Models', 'Machine Learning'] },
+	{ name: 'Computer Science', subcategories: ['Algorithms', 'Operating Systems'] },
+	{ name: 'Math', subcategories: ['Vector Space'] },
 	{ name: 'Engineering', subcategories: ['Optimization', 'System Design'] },
 ];
 
@@ -62,9 +63,9 @@ function buildCategoryTree(posts: BlogPostEntry[]): BlogCategoryTree[] {
 			name,
 			count: parentPosts.length,
 			subcategories: subcategories.map((sub) => ({
-					name: sub,
-					count: parentPosts.filter((p) => p.data.subcategory === sub).length,
-				})),
+				name: sub,
+				count: parentPosts.filter((p) => p.data.subcategory === sub).length,
+			})),
 		};
 	});
 }
