@@ -38,7 +38,11 @@ export interface BlogDataset {
 type BlogDatasetBase = Omit<BlogDataset, 'recentPosts'>;
 
 export function toSlug(name: string): string {
-	return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+	return name
+		.toLowerCase()
+		.trim()
+		.replace(/[^a-z0-9가-힣]+/g, '-')
+		.replace(/^-|-$/g, '');
 }
 
 export function getBlogPostPath(postId: string): string {
@@ -51,7 +55,7 @@ export function getBlogCategoryPath(parentName: string, subcategoryName: string)
 
 export const PREDEFINED_CATEGORIES: { name: string; subcategories: string[] }[] = [
 	{ name: 'AI', subcategories: ['Computer Vision', 'Deep Learning', 'Language Models', 'Machine Learning'] },
-	{ name: 'Math', subcategories: ['Linear Algebra', 'Probability & Statistics'] },
+	{ name: 'Math', subcategories: ['Linear Algebra', '벡터공간', 'Probability & Statistics'] },
 	{ name: 'Engineering', subcategories: ['Optimization', 'System Design'] },
 ];
 
