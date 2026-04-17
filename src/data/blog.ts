@@ -38,7 +38,11 @@ export interface BlogDataset {
 type BlogDatasetBase = Omit<BlogDataset, 'recentPosts'>;
 
 export function toSlug(name: string): string {
-	return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+	return name
+		.toLowerCase()
+		.trim()
+		.replace(/[^a-z0-9가-힣]+/g, '-')
+		.replace(/^-|-$/g, '');
 }
 
 export function getBlogPostPath(postId: string): string {
