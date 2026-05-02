@@ -435,7 +435,7 @@ function VisionViz({ id }) {
   )
 }
 
-export default function KalmanFilterViz({ variant = 'scene' }) {
+export default function KalmanFilterPostViz({ variant = 'scene' }) {
   const rawId = useId()
   const id = useMemo(() => `kalman-${variant}-${rawId.replace(/:/g, '')}`, [rawId, variant])
 
