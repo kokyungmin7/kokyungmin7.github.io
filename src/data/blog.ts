@@ -38,7 +38,11 @@ export interface BlogDataset {
 type BlogDatasetBase = Omit<BlogDataset, 'recentPosts'>;
 
 export function toSlug(name: string): string {
-	return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+	return name
+		.toLowerCase()
+		.trim()
+		.replace(/[^a-z0-9가-힣]+/g, '-')
+		.replace(/^-|-$/g, '');
 }
 
 export function getBlogPostPath(postId: string): string {
@@ -50,8 +54,12 @@ export function getBlogCategoryPath(parentName: string, subcategoryName: string)
 }
 
 export const PREDEFINED_CATEGORIES: { name: string; subcategories: string[] }[] = [
-	{ name: 'AI', subcategories: ['Computer Vision', 'Deep Learning', 'Language Models', 'Machine Learning'] },
-	{ name: 'Math', subcategories: ['Linear Algebra', 'Probability & Statistics'] },
+	{
+		name: 'AI',
+		subcategories: ['Computer Vision', 'Language Models', 'Machine Learning', '코드 구현 AI'],
+	},
+	{ name: 'Computer Science', subcategories: ['Algorithms', 'Operating Systems'] },
+	{ name: 'Math', subcategories: ['Vector Space', 'Linear Algebra'] },
 	{ name: 'Engineering', subcategories: ['Optimization', 'System Design'] },
 ];
 
@@ -62,9 +70,9 @@ function buildCategoryTree(posts: BlogPostEntry[]): BlogCategoryTree[] {
 			name,
 			count: parentPosts.length,
 			subcategories: subcategories.map((sub) => ({
-					name: sub,
-					count: parentPosts.filter((p) => p.data.subcategory === sub).length,
-				})),
+				name: sub,
+				count: parentPosts.filter((p) => p.data.subcategory === sub).length,
+			})),
 		};
 	});
 }

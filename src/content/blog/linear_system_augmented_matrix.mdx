@@ -1,0 +1,226 @@
+---
+title: '선형계와 첨가행렬 이해하기'
+description: '선형계 Ax=b, 첨가행렬 [A | b], 동차·비동차 선형계, 그리고 해 존재 조건 b ∈ Col(A)를 열벡터의 선형결합 관점에서 이해합니다.'
+pubDate: 'Apr 29 2026'
+heroImage: '../../assets/linear-system-augmented-matrix-hero.png'
+category: 'Math'
+subcategory: 'Linear Algebra'
+tags: ['Linear Algebra', 'Linear System', 'Augmented Matrix', 'Column Space', '선형대수학', '선형계', '첨가행렬', 'AI']
+---
+
+import LinearSystemViz from '../../components/LinearSystemViz'
+
+{/* Visual Plan
+- Main visual metaphor: A의 열벡터들이 만드는 도달 가능 공간과 목표 벡터 b.
+- Continuity rule: 모든 시각 자료에서 a1, a2는 같은 색의 열벡터이고 b는 목표점으로 유지한다.
+- Static visuals: 첨가행렬, 열벡터 선형결합, 동차/비동차, AI 관점, recap.
+- Interactive widget: b가 Col(A) 안에 있는지 슬라이더로 확인한다.
+- Layout stability plan: 플롯, 컨트롤, 판정 문장을 분리하고 숫자는 tabular-nums로 고정한다.
+*/}
+
+> #### 요약
+>
+> **선형계(linear system)** 는 여러 개의 일차 방정식을 행렬식 $Ax=b$ 하나로 묶어 쓴 것입니다.
+>
+> 핵심은 단순합니다. $Ax=b$에 해가 있으려면 목표 벡터 $b$가 행렬 $A$의 열벡터들이 만드는 공간, 즉 $\mathrm{Col}(A)$ 안에 있어야 합니다.
+>
+> 첨가행렬 $[A \mid b]$는 이 문제에서 "섞을 재료 $A$"와 "도달할 목표 $b$"를 한 표에 붙여 둔 형태입니다.
+
+---
+
+선형대수에서 방정식을 만날 때 가장 먼저 나오는 문장이 있습니다.
+
+$$
+Ax = b
+$$
+
+처음 보면 짧은 수식인데, 안쪽에는 꽤 많은 말이 압축되어 있습니다. 행렬 $A$는 우리가 섞을 수 있는 벡터들의 묶음이고, $x$는 얼마나 섞을지 정하는 숫자 묶음이며, $b$는 도달하고 싶은 목표입니다.
+
+이번 글에서는 이 문장을 **열벡터의 선형결합**으로 풀어보겠습니다.
+
+---
+
+행렬 $A \in M_{m \times n}(F)$와 벡터 $b \in F^m$가 있다고 하겠습니다.
+
+$M_{m \times n}(F)$는 **체(field) $F$ 위의 $m \times n$ 행렬 전체**를 뜻합니다. 여기서 체는 덧셈, 뺄셈, 곱셈, 나눗셈이 잘 되는 숫자 세계라고 생각하면 됩니다. 보통은 실수 $\mathbb{R}$를 떠올리면 충분합니다.
+
+이때
+
+$$
+Ax = b
+$$
+
+를 **선형계(linear system)** 라고 합니다. 말로 풀면 "행렬 $A$에 어떤 벡터 $x$를 넣었을 때 결과가 $b$가 되도록 하는 $x$를 찾아라"입니다.
+
+예를 들어 $A$가 $m \times n$ 행렬이면, 미지수는 $n$개이고 방정식은 $m$개입니다.
+
+$$
+A =
+\begin{pmatrix}
+a_{11} & a_{12} & \cdots & a_{1n} \\
+a_{21} & a_{22} & \cdots & a_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+a_{m1} & a_{m2} & \cdots & a_{mn}
+\end{pmatrix},
+\quad
+x =
+\begin{pmatrix}
+x_1 \\
+x_2 \\
+\vdots \\
+x_n
+\end{pmatrix},
+\quad
+b =
+\begin{pmatrix}
+b_1 \\
+b_2 \\
+\vdots \\
+b_m
+\end{pmatrix}
+$$
+
+이 수식을 한 줄씩 펼치면 익숙한 일차 방정식 묶음이 됩니다.
+
+$$
+\begin{aligned}
+a_{11}x_1 + a_{12}x_2 + \cdots + a_{1n}x_n &= b_1 \\
+a_{21}x_1 + a_{22}x_2 + \cdots + a_{2n}x_n &= b_2 \\
+&\vdots \\
+a_{m1}x_1 + a_{m2}x_2 + \cdots + a_{mn}x_n &= b_m
+\end{aligned}
+$$
+
+즉 $Ax=b$는 방정식 하나가 아니라, **여러 방정식을 행렬 표기법으로 압축한 문장**입니다.
+
+---
+
+선형계를 풀 때는 $A$와 $b$를 따로 들고 다니기보다 한 표에 붙여 씁니다.
+
+$$
+[A \mid b]
+$$
+
+이것을 **첨가행렬(augmented matrix)** 이라고 합니다. augmented는 "덧붙인"이라는 뜻입니다. 여기서는 계수행렬 $A$ 오른쪽에 목표 벡터 $b$를 덧붙였다는 의미입니다.
+
+예를 들어 다음 선형계를 보겠습니다.
+
+$$
+\begin{aligned}
+2x_1 + x_2 &= 5 \\
+x_1 - x_2 &= 1
+\end{aligned}
+$$
+
+계수행렬과 목표 벡터는 이렇게 나뉩니다.
+
+$$
+A =
+\begin{pmatrix}
+2 & 1 \\
+1 & -1
+\end{pmatrix},
+\quad
+b =
+\begin{pmatrix}
+5 \\
+1
+\end{pmatrix}
+$$
+
+첨가행렬로 쓰면 다음과 같습니다.
+
+$$
+\left[
+\begin{array}{cc|c}
+2 & 1 & 5 \\
+1 & -1 & 1
+\end{array}
+\right]
+$$
+
+세로선 왼쪽은 미지수에 붙는 계수입니다. 세로선 오른쪽은 각 방정식이 도달해야 하는 값입니다.
+
+왜 이렇게 붙여 쓸까요? 선형계를 푸는 과정에서는 양변에 같은 행 연산을 적용합니다. 그래서 왼쪽 $A$가 변할 때 오른쪽 $b$도 같이 변해야 합니다. 첨가행렬은 이 둘을 **같은 줄에서 함께 추적하는 작업장**입니다.
+
+---
+
+## 해가 존재한다는 말은 b가 Col(A)에 있다는 뜻입니다
+
+$A$의 열벡터들로 만들 수 있는 모든 선형결합을 모으면 하나의 공간이 됩니다.
+
+$$
+\mathrm{Col}(A)
+= \mathrm{span}\{a_1, a_2, \ldots, a_n\}
+$$
+
+$\mathrm{Col}(A)$는 **열공간(column space)** 입니다. 말 그대로 $A$의 열벡터들이 생성하는 공간입니다.
+
+앞 섹션에서 본 식을 다시 가져오겠습니다.
+
+$$
+Ax = x_1a_1 + x_2a_2 + \cdots + x_na_n
+$$
+
+오른쪽은 항상 $A$의 열벡터들의 선형결합입니다. 따라서 어떤 $x$를 넣어도 $Ax$는 반드시 $\mathrm{Col}(A)$ 안에 있습니다.
+
+그럼 $Ax=b$가 풀리려면 무엇이 필요할까요?
+
+$$
+Ax=b \text{ has a solution}
+\quad \Longleftrightarrow \quad
+b \in \mathrm{Col}(A)
+$$
+
+필요충분조건이라는 말은 양방향이 모두 성립한다는 뜻입니다.
+
+- 해가 있다면, 어떤 $x$에 대해 $b=Ax$입니다. 그런데 $Ax$는 열벡터의 선형결합이므로 $b \in \mathrm{Col}(A)$입니다.
+- 반대로 $b \in \mathrm{Col}(A)$라면, $b$는 $x_1a_1+\cdots+x_na_n$ 꼴로 표현됩니다. 그 계수들을 모은 벡터가 바로 해 $x$입니다.
+
+그래서 선형계를 볼 때 가장 먼저 물어야 할 질문은 "가우스 소거를 어떻게 하지?"가 아닐 수 있습니다. 더 근본적인 질문은 **목표 $b$가 도달 가능한 공간 안에 있는가?** 입니다.
+
+## 동차 선형계와 비동차 선형계
+
+<LinearSystemViz type="homogeneous" />
+
+목표 벡터 $b$가 영벡터인지 아닌지에 따라 선형계를 두 종류로 나눕니다.
+
+$$
+Ax = 0
+$$
+
+처럼 $b=0$이면 **동차 선형계(homogeneous linear system)** 라고 합니다. homogeneous는 "한 종류로 균일하다"는 뜻에 가깝습니다. 여기서는 오른쪽 목표가 전부 0인 형태를 말합니다.
+
+반대로
+
+$$
+Ax = b, \quad b \neq 0
+$$
+
+이면 **비동차 선형계(nonhomogeneous linear system)** 라고 합니다. 목표가 원점이 아니라 다른 벡터 $b$로 주어진 경우입니다.
+
+동차 선형계는 항상 적어도 하나의 해를 가집니다.
+
+$$
+x = 0
+$$
+
+를 넣으면 $A0=0$이기 때문입니다. 이 해를 **자명해(trivial solution)** 라고 부릅니다. trivial은 "특별한 계산 없이 바로 보이는" 정도로 이해하면 됩니다.
+
+비동차 선형계는 다릅니다. $b$가 $\mathrm{Col}(A)$ 안에 있으면 해가 있고, 밖에 있으면 해가 없습니다. 즉 비동차에서는 목표 벡터의 위치가 결정적입니다.
+
+## 정리
+
+<LinearSystemViz type="recap" />
+
+$Ax=b$는 행렬곱 계산식이기 전에, 목표 벡터 $b$에 도달할 수 있는지 묻는 문장입니다.
+
+- $A \in M_{m \times n}(F)$와 $b \in F^m$에 대해 $Ax=b$를 선형계라고 합니다.
+- $M_{m \times n}(F)$는 체 $F$ 위의 $m \times n$ 행렬 전체를 뜻합니다.
+- 첨가행렬 $[A \mid b]$는 계수행렬 $A$와 목표 벡터 $b$를 한 표에 붙인 것입니다.
+- $A=[a_1 \ \cdots \ a_n]$이면 $Ax=x_1a_1+\cdots+x_na_n$입니다.
+- 따라서 $Ax=b$는 $A$의 열벡터들을 섞어 $b$를 만들 수 있는지 묻는 문제입니다.
+- 해가 존재할 필요충분조건은 $b \in \mathrm{Col}(A)$입니다.
+- $b=0$이면 동차 선형계이고, $b \neq 0$이면 비동차 선형계입니다.
+
+다음 단계는 이 조건을 실제 계산으로 판정하는 방법입니다. 그때 첨가행렬과 행 연산이 본격적으로 등장합니다.
