@@ -59,7 +59,7 @@ export const PREDEFINED_CATEGORIES: { name: string; subcategories: string[] }[] 
 		subcategories: ['Computer Vision', 'Language Models', 'Machine Learning', '코드 구현 AI'],
 	},
 	{ name: 'Computer Science', subcategories: ['Algorithms', 'Operating Systems'] },
-	{ name: 'Math', subcategories: ['Vector Space'] },
+	{ name: 'Math', subcategories: ['Vector Space', 'Linear Algebra'] },
 	{ name: 'Engineering', subcategories: ['Optimization', 'System Design'] },
 ];
 
