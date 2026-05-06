@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 
 const colors = {
   obs: '#efc94c',
@@ -36,12 +36,56 @@ function SvgText({ x, y, lines, size = 14, color = colors.text, weight = 500, an
   )
 }
 
+function FormulaText({ x, y, lines, size = 17, color = colors.text, anchor = 'middle' }) {
+  const rows = Array.isArray(lines) ? lines : [lines]
+  const start = y - ((rows.length - 1) * size * 0.62)
+
+  return (
+    <text
+      x={x}
+      y={start}
+      fill={color}
+      fontSize={size}
+      fontWeight={500}
+      textAnchor={anchor}
+      dominantBaseline="middle"
+      style={{
+        fontFamily: 'STIX Two Math, Cambria Math, Latin Modern Math, Times New Roman, serif',
+        fontStyle: 'italic',
+        fontVariantNumeric: 'lining-nums tabular-nums',
+      }}
+    >
+      {rows.map((line, index) => (
+        <tspan key={line + index} x={x} dy={index === 0 ? 0 : size * 1.35}>
+          {line}
+        </tspan>
+      ))}
+    </text>
+  )
+}
+
 function NodeBox({ x, y, w, h, title, body, stroke = colors.border, fill = 'var(--bg-card)' }) {
   return (
     <g>
       <rect x={x} y={y} width={w} height={h} rx="8" fill={fill} stroke={stroke} strokeWidth="1.5" />
       <SvgText x={x + w / 2} y={y + 24} lines={title} size={15} weight={700} color={stroke} />
       <SvgText x={x + w / 2} y={y + h / 2 + 14} lines={body} size={13} color={colors.text} />
+    </g>
+  )
+}
+
+function FormulaNode({ x, y, w, h, title, formula, stroke, number }) {
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} rx="8" fill="var(--bg-card)" stroke={stroke} strokeWidth="1.5" />
+      {number && (
+        <g>
+          <circle cx={x + 23} cy={y + 23} r="11" fill={stroke} opacity="0.18" />
+          <SvgText x={x + 23} y={y + 23} lines={number} size={11} weight={800} color={stroke} />
+        </g>
+      )}
+      <SvgText x={x + 84} y={y + 24} lines={title} size={13} color={stroke} weight={700} />
+      <FormulaText x={x + w / 2} y={y + h / 2 + 17} lines={formula} size={17} color={colors.text} />
     </g>
   )
 }
@@ -200,17 +244,13 @@ function SceneViz({ id }) {
 function StateViz({ id }) {
   return (
     <Figure caption="상태는 관측값 하나가 아니라, 다음 프레임을 예측하는 데 필요한 내부 정보를 묶은 벡터입니다.">
-      <svg viewBox="0 0 900 430" role="img" aria-label="위치와 속도로 이루어진 상태 벡터가 다음 상태로 예측되는 그림" style={{ display: 'block', width: '100%', height: 'auto' }}>
+      <svg viewBox="0 0 900 290" role="img" aria-label="위치와 속도로 이루어진 상태 벡터가 다음 상태로 예측되는 그림" style={{ display: 'block', width: '100%', height: 'auto' }}>
         <MarkerDefs id={id} />
-        <NodeBox x={54} y={72} w={210} h={148} title="이전 상태" body={['위치 10m', '속도 2m/s']} stroke={colors.pred} />
-        <NodeBox x={345} y={72} w={210} h={148} title="상태 변화 모델" body={['위치 += 속도 x 시간', '속도는 유지']} stroke={colors.model} />
-        <NodeBox x={636} y={72} w={210} h={148} title="예측 상태" body={['위치 12m', '속도 2m/s']} stroke={colors.estimate} />
-        <Arrow x1="270" y1="146" x2="336" y2="146" color={colors.model} id={id} />
-        <Arrow x1="561" y1="146" x2="627" y2="146" color={colors.model} id={id} />
-
-        <rect x="120" y="275" width="660" height="92" rx="8" fill="var(--bg-card)" stroke="var(--border)" />
-        <SvgText x={450} y={302} lines="상태 벡터와 예측식" size={15} weight={700} color={colors.text} />
-        <SvgText x={450} y={336} lines={['x = [위치, 속도]^T', 'x^-_k = F x_{k-1},  F = [[1, 1], [0, 1]]']} size={14} color={colors.text} />
+        <NodeBox x={70} y={70} w={210} h={150} title="이전 상태" body={['위치 10m', '속도 2m/s']} stroke={colors.pred} />
+        <NodeBox x={345} y={70} w={210} h={150} title="상태 변화 모델" body={['위치 += 속도 x 시간', '속도는 유지']} stroke={colors.model} />
+        <NodeBox x={620} y={70} w={210} h={150} title="예측 상태" body={['위치 12m', '속도 2m/s']} stroke={colors.estimate} />
+        <Arrow x1="286" y1="145" x2="339" y2="145" color={colors.model} id={id} />
+        <Arrow x1="561" y1="145" x2="614" y2="145" color={colors.model} id={id} />
       </svg>
     </Figure>
   )
@@ -337,42 +377,33 @@ function StatCard({ label, value, text = false }) {
 }
 
 function FormulaViz({ id }) {
-  const rows = [
-    { title: '상태 예측', body: 'x^-_k = F x_{k-1} + B u_k', color: colors.pred },
-    { title: '불확실성 예측', body: 'P^-_k = F P_{k-1} F^T + Q', color: colors.pred },
-    { title: '잔차', body: 'y_k = z_k - H x^-_k', color: colors.obs },
-    { title: '칼만 이득', body: 'K_k = P^-_k H^T S_k^{-1}', color: colors.purple },
-    { title: '상태 보정', body: 'x_k = x^-_k + K_k y_k', color: colors.estimate },
-    { title: '불확실성 보정', body: 'P_k = (I - K_k H)P^-_k', color: colors.estimate },
-  ]
-
   return (
     <Figure caption="수식은 길어 보이지만, 왼쪽의 Prediction과 오른쪽의 Update라는 두 묶음으로 읽으면 흐름이 단순해집니다.">
-      <svg viewBox="0 0 920 520" role="img" aria-label="칼만 필터 전체 수식을 prediction과 update 흐름으로 묶은 그림" style={{ display: 'block', width: '100%', height: 'auto' }}>
+      <svg viewBox="0 0 920 540" role="img" aria-label="칼만 필터 전체 수식을 prediction과 update 흐름으로 묶은 그림" style={{ display: 'block', width: '100%', height: 'auto' }}>
+        <title>Kalman Filter Prediction and Update Equations</title>
+        <desc>Prediction equations produce predicted state and uncertainty, then update equations compute residual, Kalman gain, corrected state, and corrected uncertainty.</desc>
         <MarkerDefs id={id} />
-        <rect x="54" y="52" width="812" height="416" rx="8" fill="var(--bg)" stroke="var(--border)" />
-        <SvgText x={240} y={92} lines="Prediction" size={18} color={colors.pred} weight={700} />
-        <SvgText x={680} y={92} lines="Update" size={18} color={colors.estimate} weight={700} />
-        <line x1="460" y1="78" x2="460" y2="444" stroke="var(--border)" strokeWidth="1.5" />
-        {rows.map((row, index) => {
-          const left = index < 2
-          const x = left ? 100 : 520
-          const y = left ? 130 + index * 118 : 130 + (index - 2) * 78
-          const h = left ? 82 : 58
-          return (
-            <g key={row.title}>
-              <rect x={x} y={y} width="300" height={h} rx="8" fill="var(--bg-card)" stroke={row.color} strokeWidth="1.5" />
-              <SvgText x={x + 76} y={y + h / 2} lines={row.title} size={13} color={row.color} weight={700} />
-              <SvgText x={x + 210} y={y + h / 2} lines={row.body} size={13} color={colors.text} />
-            </g>
-          )
-        })}
-        <Arrow x1="244" y1="218" x2="244" y2="246" color={colors.pred} id={id} width={2} />
-        <Arrow x1="670" y1="189" x2="670" y2="202" color={colors.obs} id={id} width={2} />
-        <Arrow x1="670" y1="267" x2="670" y2="280" color={colors.purple} id={id} width={2} />
-        <Arrow x1="670" y1="345" x2="670" y2="358" color={colors.estimate} id={id} width={2} />
-        <Arrow x1="400" y1="289" x2="512" y2="159" color={colors.model} id={id} width={2.5} dash="7 7" />
-        <SvgText x={450} y={208} lines={['예측값이', '관측 공간으로 이동']} size={12} color={colors.model} />
+        <rect x="46" y="42" width="828" height="448" rx="8" fill="var(--bg)" stroke="var(--border)" />
+        <rect x="70" y="74" width="382" height="380" rx="8" fill="rgba(79,159,232,0.07)" stroke="rgba(79,159,232,0.2)" />
+        <rect x="492" y="74" width="358" height="380" rx="8" fill="rgba(40,180,123,0.06)" stroke="rgba(40,180,123,0.2)" />
+        <SvgText x={261} y={104} lines="Prediction" size={18} color={colors.pred} weight={700} />
+        <SvgText x={671} y={104} lines="Update" size={18} color={colors.estimate} weight={700} />
+        <line x1="472" y1="88" x2="472" y2="438" stroke="var(--border)" strokeWidth="1.5" />
+
+        <FormulaNode x={96} y={142} w={330} h={90} number="1" title="상태 예측" formula="x̂ₖ⁻ = Fxₖ₋₁ + Buₖ" stroke={colors.pred} />
+        <FormulaNode x={96} y={306} w={330} h={90} number="2" title="불확실성 예측" formula="Pₖ⁻ = FPₖ₋₁Fᵀ + Q" stroke={colors.pred} />
+
+        <FormulaNode x={526} y={116} w={290} h={72} number="3" title="잔차" formula="yₖ = zₖ − Hx̂ₖ⁻" stroke={colors.obs} />
+        <FormulaNode x={526} y={212} w={290} h={72} number="4" title="칼만 이득" formula="Kₖ = Pₖ⁻HᵀSₖ⁻¹" stroke={colors.purple} />
+        <FormulaNode x={526} y={308} w={290} h={72} number="5" title="상태 보정" formula="x̂ₖ = x̂ₖ⁻ + Kₖyₖ" stroke={colors.estimate} />
+        <FormulaNode x={526} y={404} w={290} h={72} number="6" title="불확실성 보정" formula="Pₖ = (I − KₖH)Pₖ⁻" stroke={colors.estimate} />
+
+        <Arrow x1="261" y1="236" x2="261" y2="296" color={colors.pred} id={id} width={2.2} />
+        <Arrow x1="671" y1="192" x2="671" y2="204" color={colors.obs} id={id} width={2.2} />
+        <Arrow x1="671" y1="288" x2="671" y2="300" color={colors.purple} id={id} width={2.2} />
+        <Arrow x1="671" y1="384" x2="671" y2="396" color={colors.estimate} id={id} width={2.2} />
+        <Arrow x1="426" y1="350" x2="518" y2="152" color={colors.model} id={id} width={2.4} dash="7 7" />
+        <SvgText x={466} y={250} lines={['예측 상태와', '불확실성이', 'update의 입력']} size={12} color={colors.model} />
       </svg>
     </Figure>
   )
@@ -413,6 +444,27 @@ function NumericViz({ id }) {
   )
 }
 
+function UpdateViz({ id }) {
+  return (
+    <Figure caption="update 단계에서 관측값 z_k와 예측값의 차이인 잔차 y_k를 계산하고, K_k 비율만큼 예측 상태를 보정합니다.">
+      <svg viewBox="0 0 900 290" role="img" aria-label="칼만 필터 update: 관측값으로 예측 상태를 보정하는 흐름" style={{ display: 'block', width: '100%', height: 'auto' }}>
+        <MarkerDefs id={id} />
+        <NodeBox x={54} y={70} w={210} h={150} title="예측 상태" body={['위치 12m', '속도 2m/s']} stroke={colors.pred} />
+        <g>
+          <rect x="345" y="70" width="210" height="150" rx="8" fill="var(--bg-card)" stroke={colors.purple} strokeWidth="1.5" />
+          <SvgText x={450} y={94} lines="update 연산" size={15} weight={700} color={colors.purple} />
+          <FormulaText x={450} y={151} lines={['yₖ = zₖ − Hx̂ₖ⁻', 'xₖ = x̂ₖ⁻ + Kₖyₖ']} size={17} color={colors.text} />
+        </g>
+        <NodeBox x={636} y={70} w={210} h={150} title="보정 상태" body={['위치 12.714m', '속도 2m/s']} stroke={colors.estimate} />
+        <Arrow x1="270" y1="145" x2="339" y2="145" color={colors.purple} id={id} />
+        <Arrow x1="561" y1="145" x2="630" y2="145" color={colors.estimate} id={id} />
+        <Arrow x1="450" y1="34" x2="450" y2="64" color={colors.obs} id={id} />
+        <SvgText x={450} y={22} lines="관측값 z_k = 13m" size={13} color={colors.obs} weight={700} />
+      </svg>
+    </Figure>
+  )
+}
+
 function VisionViz({ id }) {
   return (
     <Figure caption="Vision AI tracking에서는 detector가 매 프레임 만든 bounding box를 관측값으로 보고, 칼만 필터가 프레임 사이의 자연스러운 이동을 이어 줍니다.">
@@ -435,15 +487,440 @@ function VisionViz({ id }) {
   )
 }
 
+const SIM_LENGTH = 50
+const chartBox = { x: 58, y: 28, w: 784, h: 252 }
+
+function fixedNoise(seed) {
+  const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453
+  return (x - Math.floor(x)) * 2 - 1
+}
+
+function makeKalmanSeries(q, r) {
+  const truth = []
+  const measurements = []
+  let value = 5
+
+  for (let i = 0; i < SIM_LENGTH; i += 1) {
+    value += 0.34 * Math.sin(i * 0.24) + 0.11 * fixedNoise(i + 1)
+    truth.push(value)
+    measurements.push(value + Math.sqrt(r) * fixedNoise(i + 101))
+  }
+
+  const results = []
+  let estimate = 0
+  let uncertainty = 20
+
+  for (let i = 0; i < SIM_LENGTH; i += 1) {
+    const predicted = estimate
+    const predictedUncertainty = uncertainty + q
+    const gain = predictedUncertainty / (predictedUncertainty + r)
+    const innovation = measurements[i] - predicted
+    estimate = predicted + gain * innovation
+    uncertainty = (1 - gain) * predictedUncertainty
+
+    results.push({
+      step: i + 1,
+      truth: truth[i],
+      measurement: measurements[i],
+      predicted,
+      predictedUncertainty,
+      estimate,
+      uncertainty,
+      gain,
+      innovation,
+    })
+  }
+
+  return results
+}
+
+function linePath(points, xOf, yOf) {
+  return points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${xOf(point)} ${yOf(point)}`).join(' ')
+}
+
+function bandPath(points, xOf, yUpper, yLower) {
+  if (points.length < 2) return ''
+  const top = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${xOf(point)} ${yUpper(point)}`)
+  const bottom = [...points].reverse().map((point) => `L ${xOf(point)} ${yLower(point)}`)
+  return `${top.join(' ')} ${bottom.join(' ')} Z`
+}
+
+function StepEquation({ title, formulas, note, active, color }) {
+  return (
+    <div
+      className={`kalman-sim__eq ${active ? 'kalman-sim__eq--active' : ''}`}
+      style={{
+        '--eq-color': color,
+      }}
+    >
+      <div className="kalman-sim__eq-title">{title}</div>
+      {formulas.map((formula) => (
+        <div className="kalman-sim__formula" key={formula}>{formula}</div>
+      ))}
+      <div className="kalman-sim__eq-note">{note}</div>
+    </div>
+  )
+}
+
+function InteractiveViz() {
+  const [q, setQ] = useState(1)
+  const [r, setR] = useState(5)
+  const [step, setStep] = useState(18)
+  const [phase, setPhase] = useState('predict')
+  const [playing, setPlaying] = useState(false)
+  const series = useMemo(() => makeKalmanSeries(q, r), [q, r])
+  const visibleCount = phase === 'update' ? Math.min(step + 1, SIM_LENGTH) : step
+  const visible = series.slice(0, Math.max(0, visibleCount))
+  const preview = phase === 'predict' && step < SIM_LENGTH ? series[step] : null
+  const current = series[Math.max(0, Math.min(visibleCount - 1, SIM_LENGTH - 1))]
+  const allValues = series.flatMap((item) => {
+    const sigma = 2 * Math.sqrt(item.uncertainty)
+    const predictedSigma = 2 * Math.sqrt(item.predictedUncertainty)
+    return [item.truth, item.measurement, item.estimate + sigma, item.estimate - sigma, item.predicted + predictedSigma, item.predicted - predictedSigma]
+  })
+  const minY = Math.min(...allValues) - 0.8
+  const maxY = Math.max(...allValues) + 0.8
+  const xOf = (item) => chartBox.x + ((item.step - 1) / (SIM_LENGTH - 1)) * chartBox.w
+  const yOf = (value) => chartBox.y + chartBox.h - ((value - minY) / (maxY - minY)) * chartBox.h
+  const truthPath = linePath(visible, xOf, (item) => yOf(item.truth))
+  const estimatePath = linePath(visible, xOf, (item) => yOf(item.estimate))
+  const uncertaintyPath = bandPath(
+    visible,
+    xOf,
+    (item) => yOf(item.estimate + 2 * Math.sqrt(item.uncertainty)),
+    (item) => yOf(item.estimate - 2 * Math.sqrt(item.uncertainty)),
+  )
+  const status = current.gain > 0.62
+    ? '측정값을 강하게 따라갑니다.'
+    : current.gain < 0.38
+      ? '모델 예측 쪽에 더 머뭅니다.'
+      : '예측과 측정을 균형 있게 섞습니다.'
+  const activeStatus = phase === 'predict'
+    ? '아직 측정값을 보정하기 전입니다.'
+    : status
+
+  useEffect(() => {
+    if (!playing) return undefined
+
+    const timer = window.setInterval(() => {
+      setPhase((nextPhase) => {
+        if (nextPhase === 'predict') {
+          if (step >= SIM_LENGTH) {
+            setPlaying(false)
+            return 'predict'
+          }
+          return 'update'
+        }
+        setStep((nextStep) => {
+          const nextCompletedStep = Math.min(nextStep + 1, SIM_LENGTH)
+          if (nextCompletedStep >= SIM_LENGTH) {
+            setPlaying(false)
+          }
+          return nextCompletedStep
+        })
+        return 'predict'
+      })
+    }, 420)
+
+    return () => window.clearInterval(timer)
+  }, [playing, step])
+
+  const setNoise = (setter) => (event) => {
+    setter(Number(event.target.value))
+    setPlaying(false)
+    setPhase('predict')
+  }
+
+  const reset = () => {
+    setPlaying(false)
+    setStep(0)
+    setPhase('predict')
+  }
+
+  const advance = () => {
+    setPlaying(false)
+    if (phase === 'predict') {
+      setPhase('update')
+      return
+    }
+    setStep((nextStep) => Math.min(SIM_LENGTH, nextStep + 1))
+    setPhase('predict')
+  }
+
+  const togglePlayback = () => {
+    if (step >= SIM_LENGTH) {
+      setStep(0)
+      setPhase('predict')
+      setPlaying(true)
+      return
+    }
+    setPlaying((value) => !value)
+  }
+
+  return (
+    <Figure caption="Q를 키우면 모델을 덜 믿고 측정값 쪽으로 빨리 움직입니다. R을 키우면 센서를 덜 믿어서 추정선이 더 완만하게 따라갑니다.">
+      <div className="kalman-sim">
+        <div className="kalman-sim__equations">
+          <StepEquation
+            title="1단계 - 예측 predict"
+            formulas={['x̂⁻ₖ = F · x̂ₖ₋₁', 'P⁻ₖ = FPFᵀ + Q']}
+            note="이전 추정값과 모델로 다음 상태를 먼저 그립니다."
+            active={phase === 'predict'}
+            color={colors.pred}
+          />
+          <StepEquation
+            title="2단계 - 업데이트 update"
+            formulas={['K = P⁻ / (P⁻ + R)', 'x̂ₖ = x̂⁻ₖ + K(zₖ - x̂⁻ₖ)']}
+            note="측정값 z와의 차이를 K만큼 흡수합니다."
+            active={phase === 'update'}
+            color={colors.estimate}
+          />
+        </div>
+
+        <div className="kalman-sim__legend" aria-hidden="true">
+          <span><i className="kalman-sim__dash" /> 실제 상태</span>
+          <span><i className="kalman-sim__dot" /> 측정값 z</span>
+          <span><i className="kalman-sim__line" /> 추정값 x̂</span>
+          <span><i className="kalman-sim__band" /> 불확실성 ±2σ</span>
+        </div>
+
+        <svg className="kalman-sim__chart" viewBox="0 0 900 330" role="img" aria-label="과정 잡음 Q와 측정 잡음 R에 따라 칼만 추정값, 측정값, 불확실성이 변하는 시뮬레이션">
+          <rect x={chartBox.x} y={chartBox.y} width={chartBox.w} height={chartBox.h} rx="8" fill="var(--bg)" stroke="var(--border)" />
+          {[0, 1, 2, 3, 4].map((tick) => {
+            const y = chartBox.y + (chartBox.h / 4) * tick
+            return <line key={tick} x1={chartBox.x} y1={y} x2={chartBox.x + chartBox.w} y2={y} stroke="color-mix(in srgb, var(--text) 8%, transparent)" />
+          })}
+          {[0, 10, 20, 30, 40, 49].map((index) => {
+            const x = chartBox.x + (index / (SIM_LENGTH - 1)) * chartBox.w
+            return (
+              <g key={index}>
+                <line x1={x} y1={chartBox.y} x2={x} y2={chartBox.y + chartBox.h} stroke="color-mix(in srgb, var(--text) 7%, transparent)" />
+                <text x={x} y={chartBox.y + chartBox.h + 26} fill={colors.muted} fontSize="12" textAnchor="middle">{index + 1}</text>
+              </g>
+            )
+          })}
+          <text x={chartBox.x + chartBox.w / 2} y="326" fill={colors.muted} fontSize="12" textAnchor="middle">시간 단계 k</text>
+          {uncertaintyPath && <path d={uncertaintyPath} fill="rgba(79,159,232,0.14)" stroke="rgba(79,159,232,0.22)" />}
+          {truthPath && <path d={truthPath} fill="none" stroke="color-mix(in srgb, var(--text) 44%, transparent)" strokeWidth="2" strokeDasharray="7 6" strokeLinecap="round" />}
+          {visible.map((item) => (
+            <g key={item.step}>
+              <circle cx={xOf(item)} cy={yOf(item.measurement)} r="5" fill={colors.obs} opacity="0.9" />
+              <line x1={xOf(item) - 5} y1={yOf(item.measurement) - 5} x2={xOf(item) + 5} y2={yOf(item.measurement) + 5} stroke="var(--bg)" strokeWidth="1.4" />
+              <line x1={xOf(item) + 5} y1={yOf(item.measurement) - 5} x2={xOf(item) - 5} y2={yOf(item.measurement) + 5} stroke="var(--bg)" strokeWidth="1.4" />
+            </g>
+          ))}
+          {estimatePath && <path d={estimatePath} fill="none" stroke={colors.estimate} strokeWidth="3.2" strokeLinecap="round" />}
+          {preview && (
+            <g aria-label="보정 전 예측값">
+              <line
+                x1={xOf(preview)}
+                y1={yOf(preview.predicted + 2 * Math.sqrt(preview.predictedUncertainty))}
+                x2={xOf(preview)}
+                y2={yOf(preview.predicted - 2 * Math.sqrt(preview.predictedUncertainty))}
+                stroke={colors.pred}
+                strokeWidth="7"
+                strokeLinecap="round"
+                opacity="0.18"
+              />
+              <circle cx={xOf(preview)} cy={yOf(preview.predicted)} r="7" fill="var(--bg)" stroke={colors.pred} strokeWidth="3" />
+            </g>
+          )}
+        </svg>
+
+        <div className="kalman-sim__metrics">
+          <StatCard label="칼만 이득 K" value={phase === 'update' ? current.gain.toFixed(3) : '—'} />
+          <StatCard label={phase === 'predict' ? '예측 불확실성 P⁻' : '불확실성 P'} value={phase === 'predict' && preview ? preview.predictedUncertainty.toFixed(2) : current.uncertainty.toFixed(2)} />
+          <StatCard label="innovation z - x̂⁻" value={phase === 'update' ? current.innovation.toFixed(2) : '—'} />
+          <StatCard label="현재 해석" value={activeStatus} text />
+        </div>
+
+        <div className="kalman-sim__controls">
+          <label>
+            <span>과정 잡음 Q <b>{q.toFixed(1)}</b></span>
+            <input type="range" min="0.1" max="10" step="0.1" value={q} onChange={setNoise(setQ)} />
+            <small>Q↑: 모델을 덜 믿고 측정값에 더 민감해집니다.</small>
+          </label>
+          <label>
+            <span>측정 잡음 R <b>{r.toFixed(1)}</b></span>
+            <input type="range" min="0.5" max="20" step="0.5" value={r} onChange={setNoise(setR)} />
+            <small>R↑: 센서를 덜 믿고 예측선을 더 오래 유지합니다.</small>
+          </label>
+        </div>
+
+        <div className="kalman-sim__buttons">
+          <button type="button" onClick={togglePlayback}>{playing ? '일시정지' : step >= SIM_LENGTH ? '다시 보기' : '재생'}</button>
+          <button type="button" onClick={advance}>한 단계</button>
+          <button type="button" onClick={reset}>초기화</button>
+          <span>단계 {step}/{SIM_LENGTH}</span>
+        </div>
+      </div>
+      <style>{`
+        .kalman-sim {
+          display: grid;
+          gap: 0.9rem;
+          padding: 1rem;
+        }
+        .kalman-sim__equations {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.75rem;
+        }
+        .kalman-sim__eq {
+          min-height: 134px;
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          background: var(--bg-card);
+          padding: 0.8rem;
+          transition: border-color 0.2s ease, background 0.2s ease;
+        }
+        .kalman-sim__eq--active {
+          border-color: var(--eq-color);
+          background: color-mix(in srgb, var(--eq-color) 11%, var(--bg-card));
+        }
+        .kalman-sim__eq-title {
+          color: var(--eq-color);
+          font-size: 0.82rem;
+          font-weight: 800;
+          margin-bottom: 0.45rem;
+        }
+        .kalman-sim__formula {
+          color: var(--text);
+          font-family: STIX Two Math, Cambria Math, Latin Modern Math, Times New Roman, serif;
+          font-size: 1rem;
+          line-height: 1.7;
+        }
+        .kalman-sim__eq-note {
+          color: var(--text-muted);
+          font-size: 0.78rem;
+          line-height: 1.55;
+          margin-top: 0.35rem;
+        }
+        .kalman-sim__legend {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.6rem 1rem;
+          color: var(--text-muted);
+          font-size: 0.78rem;
+        }
+        .kalman-sim__legend span {
+          align-items: center;
+          display: inline-flex;
+          gap: 0.38rem;
+        }
+        .kalman-sim__dash,
+        .kalman-sim__line {
+          display: inline-block;
+          width: 24px;
+          border-top: 2px dashed color-mix(in srgb, var(--text) 44%, transparent);
+        }
+        .kalman-sim__line {
+          border-top: 3px solid ${colors.estimate};
+        }
+        .kalman-sim__dot {
+          width: 9px;
+          height: 9px;
+          border-radius: 999px;
+          background: ${colors.obs};
+        }
+        .kalman-sim__band {
+          width: 18px;
+          height: 10px;
+          border-radius: 2px;
+          background: rgba(79,159,232,0.14);
+          border: 1px solid rgba(79,159,232,0.24);
+        }
+        .kalman-sim__chart {
+          display: block;
+          width: 100%;
+          min-height: 260px;
+        }
+        .kalman-sim__metrics {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 0.65rem;
+        }
+        .kalman-sim__controls {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.75rem;
+        }
+        .kalman-sim__controls label {
+          display: grid;
+          gap: 0.4rem;
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          background: var(--bg-card);
+          padding: 0.75rem;
+        }
+        .kalman-sim__controls span {
+          display: flex;
+          justify-content: space-between;
+          color: var(--text-muted);
+          font-size: 0.84rem;
+        }
+        .kalman-sim__controls b {
+          color: var(--text);
+          font-variant-numeric: tabular-nums;
+        }
+        .kalman-sim__controls input {
+          accent-color: ${colors.estimate};
+          width: 100%;
+        }
+        .kalman-sim__controls small {
+          color: var(--text-muted);
+          font-size: 0.75rem;
+          line-height: 1.45;
+        }
+        .kalman-sim__buttons {
+          align-items: center;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+        .kalman-sim__buttons button {
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          background: var(--bg-card);
+          color: var(--text);
+          cursor: pointer;
+          font: inherit;
+          font-size: 0.84rem;
+          padding: 0.48rem 0.75rem;
+        }
+        .kalman-sim__buttons span {
+          color: var(--text-muted);
+          font-size: 0.82rem;
+          font-variant-numeric: tabular-nums;
+        }
+        @media (max-width: 720px) {
+          .kalman-sim {
+            padding: 0.75rem;
+          }
+          .kalman-sim__equations,
+          .kalman-sim__metrics,
+          .kalman-sim__controls {
+            grid-template-columns: 1fr;
+          }
+          .kalman-sim__chart {
+            min-height: 220px;
+          }
+        }
+      `}</style>
+    </Figure>
+  )
+}
+
 export default function KalmanFilterPostViz({ variant = 'scene' }) {
   const rawId = useId()
   const id = useMemo(() => `kalman-${variant}-${rawId.replace(/:/g, '')}`, [rawId, variant])
 
+  if (variant === 'update') return <UpdateViz id={id} />
   if (variant === 'state') return <StateViz id={id} />
   if (variant === 'cycle') return <CycleViz id={id} />
   if (variant === 'gain') return <GainViz />
   if (variant === 'formula') return <FormulaViz id={id} />
   if (variant === 'numeric') return <NumericViz id={id} />
   if (variant === 'vision') return <VisionViz id={id} />
+  if (variant === 'interactive') return <InteractiveViz />
   return <SceneViz id={id} />
 }
